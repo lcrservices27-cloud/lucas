@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://www.floraquiteria.com.br
+Sitemap: https://www.floraquiteria.com.br/sitemap.xml
