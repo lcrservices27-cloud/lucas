@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOTRE Beneficiário | Portal do Plano de Saúde</title>
+  <meta name="description" content="Plataforma de suporte financeiro para beneficiários NOTRE. 2ª via de boleto, negociação de mensalidades e antecipação. Atendimento pelo WhatsApp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange:     #C95F1A;
+      --orange-mid: #D9722A;
+      --orange-lt:  #F4976C;
+      --orange-bg:  #FFF5EF;
+      --text:       #1A1A1A;
+      --text-muted: #6B6B6B;
+      --border:     #E8E0DA;
+      --white:      #FFFFFF;
+      --radius:     14px;
+      --radius-sm:  8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAVBAR ───────────────────────────────────────── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+    }
+    .nav__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav__logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav__logo-icon svg { width: 20px; height: 20px; fill: none; stroke: white; stroke-width: 2; }
+    .nav__logo-text { line-height: 1.1; }
+    .nav__logo-text strong { display: block; font-weight: 800; font-size: 15px; color: var(--orange); letter-spacing: 0.5px; }
+    .nav__logo-text span { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; }
+    .nav__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--orange);
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav__cta:hover { background: var(--orange-mid); }
+    .nav__cta svg { width: 16px; height: 16px; fill: white; }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(150deg, #B5501A 0%, #C95F1A 40%, #D9722A 100%);
+      padding: 64px 20px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero__inner {
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.95);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+    }
+    .hero__badge::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      background: #7EFFA0;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.4); }
+    }
+    .hero__title {
+      font-size: clamp(32px, 8vw, 48px);
+      font-weight: 800;
+      color: white;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 18px;
+    }
+    .hero__title em {
+      font-style: normal;
+      text-decoration: underline;
+      text-decoration-color: rgba(255,255,255,0.4);
+      text-underline-offset: 4px;
+    }
+    .hero__sub {
+      font-size: 17px;
+      color: rgba(255,255,255,0.88);
+      line-height: 1.6;
+      margin-bottom: 36px;
+      max-width: 520px;
+    }
+    .hero__actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      color: var(--orange);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.2); }
+    .btn-primary svg { width: 18px; height: 18px; }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── TRUST BAR ────────────────────────────────────── */
+    .trust {
+      background: var(--orange-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 20px;
+    }
+    .trust__inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px 32px;
+      flex-wrap: wrap;
+    }
+    .trust__item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .trust__item svg { width: 16px; height: 16px; color: var(--orange); flex-shrink: 0; }
+    .trust__sep { width: 1px; height: 20px; background: var(--border); }
+    @media (max-width: 500px) { .trust__sep { display: none; } }
+
+    /* ── SECTION WRAPPER ──────────────────────────────── */
+    .section { padding: 64px 20px; }
+    .section--gray { background: #F9F7F5; }
+    .section__inner { max-width: 1000px; margin: 0 auto; }
+    .section__label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 12px;
+    }
+    .section__title {
+      font-size: clamp(26px, 5vw, 36px);
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+      margin-bottom: 14px;
+    }
+    .section__sub {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+    .section__header { margin-bottom: 44px; }
+    .section__header--center { text-align: center; }
+    .section__header--center .section__sub { margin: 0 auto; }
+
+    /* ── SERVICES ─────────────────────────────────────── */
+    .services__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .service-card {
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .service-card:hover {
+      border-color: var(--orange-lt);
+      box-shadow: 0 8px 32px rgba(201,95,26,0.12);
+      transform: translateY(-3px);
+    }
+    .service-card__icon {
+      width: 52px;
+      height: 52px;
+      background: var(--orange);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .service-card__icon svg { width: 26px; height: 26px; stroke: white; fill: none; stroke-width: 1.8; }
+    .service-card__body { flex: 1; }
+    .service-card__title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .service-card__desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .service-card__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--orange);
+      background: var(--orange-bg);
+      padding: 10px 18px;
+      border-radius: 50px;
+      transition: background 0.2s;
+      align-self: flex-start;
+    }
+    .service-card:hover .service-card__link { background: #FBEDE3; }
+    .service-card__link svg { width: 14px; height: 14px; }
+
+    /* ── HOW IT WORKS ─────────────────────────────────── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: calc(100% / 6);
+      right: calc(100% / 6);
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange), var(--orange-lt));
+      border-radius: 2px;
+    }
+    @media (max-width: 700px) { .steps::before { display: none; } }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 16px 0;
+      gap: 16px;
+    }
+    .step__num {
+      width: 56px;
+      height: 56px;
+      background: var(--orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 4px 16px rgba(201,95,26,0.3);
+      flex-shrink: 0;
+    }
+    .step__title { font-size: 16px; font-weight: 700; color: var(--text); }
+    .step__desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── STATS ────────────────────────────────────────── */
+    .stats {
+      background: linear-gradient(135deg, #B5501A 0%, #C95F1A 60%, #D9722A 100%);
+      padding: 56px 20px;
+    }
+    .stats__inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px 20px;
+    }
+    @media (min-width: 600px) { .stats__inner { grid-template-columns: repeat(4, 1fr); } }
+    .stat {
+      text-align: center;
+    }
+    .stat__num {
+      font-size: clamp(32px, 7vw, 48px);
+      font-weight: 800;
+      color: white;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat__label {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .stat__divider {
+      width: 32px;
+      height: 3px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 2px;
+      margin: 8px auto 0;
+    }
+
+    /* ── WHO WE ARE ───────────────────────────────────── */
+    .about__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    @media (min-width: 760px) {
+      .about__grid { grid-template-columns: 1fr 1fr; }
+    }
+    .about__values { display: flex; flex-direction: column; gap: 16px; }
+    .value-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .value-item__icon {
+      width: 40px;
+      height: 40px;
+      background: var(--orange-bg);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .value-item__icon svg { width: 20px; height: 20px; stroke: var(--orange); fill: none; stroke-width: 1.8; }
+    .value-item__title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .value-item__desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .about__text p { font-size: 16px; color: var(--text-muted); line-height: 1.8; margin-bottom: 16px; }
+    .about__text p:last-child { margin-bottom: 0; }
+
+    /* ── FINAL CTA ────────────────────────────────────── */
+    .cta-block {
+      background: linear-gradient(150deg, #B5501A 0%, #C95F1A 50%, #D9722A 100%);
+      padding: 64px 20px;
+      text-align: center;
+    }
+    .cta-block__inner { max-width: 600px; margin: 0 auto; }
+    .cta-block__title {
+      font-size: clamp(26px, 5vw, 38px);
+      font-weight: 800;
+      color: white;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      letter-spacing: -0.3px;
+    }
+    .cta-block__sub {
+      font-size: 16px;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+    .cta-block__actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ───────────────────────────────────────── */
+    .footer {
+      background: #1A1A1A;
+      padding: 36px 20px;
+      text-align: center;
+    }
+    .footer__logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .footer__logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer__logo-icon svg { width: 16px; height: 16px; fill: none; stroke: white; stroke-width: 2; }
+    .footer__logo-text strong { font-size: 14px; font-weight: 800; color: white; letter-spacing: 0.5px; display: block; }
+    .footer__logo-text span { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; text-transform: uppercase; }
+    .footer__copy { font-size: 13px; color: rgba(255,255,255,0.35); line-height: 1.6; }
+
+    /* ── FLOAT CHAT ───────────────────────────────────── */
+    .float-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: var(--orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(201,95,26,0.45);
+      z-index: 90;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .float-btn:hover { transform: scale(1.08); box-shadow: 0 8px 30px rgba(201,95,26,0.55); }
+    .float-btn svg { width: 26px; height: 26px; fill: white; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="#" class="nav__logo">
+      <div class="nav__logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21C12 21 3 15.5 3 9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.5-9 12-9 12z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="nav__logo-text">
+        <strong>NOTRE</strong>
+        <span>Beneficiário</span>
+      </div>
+    </a>
+    <a href="#servicos" class="nav__cta">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Atendimento Online
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__inner">
+    <div class="hero__badge">Beneficiário NOTRE</div>
+    <h1 class="hero__title">
+      Resolva tudo do seu<br>plano de saúde<br><em>sem sair de casa.</em>
+    </h1>
+    <p class="hero__sub">
+      2ª via de boleto, negociação de mensalidades em atraso e antecipação de pagamento — tudo pelo WhatsApp, com atendimento humano e resposta em minutos.
+    </p>
+    <div class="hero__actions">
+      <a href="#servicos" class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <path d="M2 10h20"/>
+        </svg>
+        Gerar Boleto Agora
+      </a>
+      <a href="#servicos" class="btn-ghost">Ver todas as soluções</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust">
+  <div class="trust__inner">
+    <div class="trust__item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Ambiente 100% seguro
+    </div>
+    <div class="trust__sep"></div>
+    <div class="trust__item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Resposta em minutos
+    </div>
+    <div class="trust__sep"></div>
+    <div class="trust__item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Atendimento humanizado
+    </div>
+    <div class="trust__sep"></div>
+    <div class="trust__item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 11 12 14 22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      Exclusivo para beneficiários NOTRE
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="section" id="servicos">
+  <div class="section__inner">
+    <div class="section__header">
+      <div class="section__label">Nossas Soluções</div>
+      <h2 class="section__title">O que você precisa resolver hoje?</h2>
+      <p class="section__sub">Escolha o serviço e seja atendido por um especialista pelo WhatsApp — rápido, simples e sem burocracia.</p>
+    </div>
+    <div class="services__grid">
+
+      <!-- 2ª Via -->
+      <div class="service-card">
+        <div class="service-card__icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <path d="M2 10h20M6 15h2M10 15h4"/>
+          </svg>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__title">2ª Via de Boleto</div>
+          <div class="service-card__desc">Perdeu ou não recebeu o boleto do seu plano? Solicite a segunda via agora mesmo, sem precisar ligar ou se deslocar.</div>
+        </div>
+        <a href="#" class="service-card__link">
+          Solicitar agora
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <!-- Mensalidades em Atraso -->
+      <div class="service-card">
+        <div class="service-card__icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <path d="M16 2v4M8 2v4M3 10h18"/>
+            <circle cx="12" cy="15" r="2"/>
+          </svg>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__title">Mensalidades em Atraso</div>
+          <div class="service-card__desc">Está com parcelas pendentes? Negocie seus débitos de forma rápida e sem complicação para manter seu plano ativo.</div>
+        </div>
+        <a href="#" class="service-card__link">
+          Regularizar agora
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <!-- Antecipação -->
+      <div class="service-card">
+        <div class="service-card__icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v5l3 3"/>
+            <path d="M7 3.5A9 9 0 0 1 21 12"/>
+            <polyline points="21 3 21 8 16 8"/>
+          </svg>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__title">Antecipe sua Mensalidade</div>
+          <div class="service-card__desc">Prefere pagar adiantado e ter a tranquilidade garantida? Antecipe sua mensalidade de forma simples e evite imprevistos.</div>
+        </div>
+        <a href="#" class="service-card__link">
+          Antecipar agora
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section section--gray">
+  <div class="section__inner">
+    <div class="section__header section__header--center">
+      <div class="section__label">Como Funciona</div>
+      <h2 class="section__title">Em 3 passos, tudo resolvido</h2>
+      <p class="section__sub">Sem ligação, sem fila, sem papelada. Só você e um especialista no WhatsApp.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step__num">1</div>
+        <div class="step__title">Escolha o serviço</div>
+        <p class="step__desc">Selecione o que você precisa — boleto, atraso ou antecipação.</p>
+      </div>
+      <div class="step">
+        <div class="step__num">2</div>
+        <div class="step__title">Fale com um especialista</div>
+        <p class="step__desc">Você é direcionado imediatamente para um atendente pelo WhatsApp.</p>
+      </div>
+      <div class="step">
+        <div class="step__num">3</div>
+        <div class="step__title">Problema resolvido</div>
+        <p class="step__desc">Receba o que precisar em minutos, de forma segura e sem burocracia.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats__inner">
+    <div class="stat">
+      <div class="stat__num">11.250+</div>
+      <div class="stat__divider"></div>
+      <div class="stat__label">Atendimentos</div>
+    </div>
+    <div class="stat">
+      <div class="stat__num">9.000+</div>
+      <div class="stat__divider"></div>
+      <div class="stat__label">Boletos Emitidos</div>
+    </div>
+    <div class="stat">
+      <div class="stat__num">5 dias</div>
+      <div class="stat__divider"></div>
+      <div class="stat__label">Por semana</div>
+    </div>
+    <div class="stat">
+      <div class="stat__num">26</div>
+      <div class="stat__divider"></div>
+      <div class="stat__label">Premiações</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHO WE ARE -->
+<section class="section">
+  <div class="section__inner">
+    <div class="about__grid">
+      <div>
+        <div class="section__label">Quem Somos</div>
+        <h2 class="section__title">Apoio digital para quem já é NOTRE</h2>
+        <div class="about__text">
+          <p>Somos uma plataforma criada exclusivamente para beneficiários da NOTRE — uma das maiores operadoras de saúde do Brasil.</p>
+          <p>Aqui você resolve as questões financeiras do seu plano de forma digital, com tecnologia de ponta e atendimento humano. Sem filas, sem estresse, sem precisar ir a nenhum lugar.</p>
+          <p>Nossa missão é simples: garantir que o seu plano de saúde continue ativo e funcionando para você e para quem você ama.</p>
+        </div>
+      </div>
+      <div class="about__values">
+        <div class="value-item">
+          <div class="value-item__icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21C12 21 3 15.5 3 9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.5-9 12-9 12z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="value-item__title">Uma conquista que vale preservar</div>
+            <div class="value-item__desc">Ter um plano de saúde ativo é importante. Estamos aqui para garantir que você não perca isso por um contratempo financeiro.</div>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-item__icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="value-item__title">Segurança e privacidade</div>
+            <div class="value-item__desc">Suas informações são tratadas com total sigilo e responsabilidade. Ambiente desenvolvido exclusivamente para beneficiários NOTRE.</div>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-item__icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 12l3 3 5-5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="value-item__title">Tudo em um só lugar</div>
+            <div class="value-item__desc">Uma experiência pensada para facilitar sua relação com o plano. Simples, rápida e sem complicações.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-block">
+  <div class="cta-block__inner">
+    <h2 class="cta-block__title">Pronto para resolver agora mesmo?</h2>
+    <p class="cta-block__sub">Fale com um especialista NOTRE e resolva tudo pelo WhatsApp em poucos minutos. Sem burocracia, sem espera.</p>
+    <div class="cta-block__actions">
+      <a href="#servicos" class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <path d="M2 10h20"/>
+        </svg>
+        Gerar Boleto Agora
+      </a>
+      <a href="#servicos" class="btn-ghost">Ver todas as soluções</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer__logo">
+    <div class="footer__logo-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21C12 21 3 15.5 3 9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.5-9 12-9 12z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="footer__logo-text">
+      <strong>NOTRE</strong>
+      <span>Beneficiário</span>
+    </div>
+  </div>
+  <p class="footer__copy">
+    Portal de suporte financeiro para beneficiários NOTRE.<br>
+    Este é um canal de atendimento digital. Não somos a operadora NOTRE.
+  </p>
+</footer>
+
+<!-- FLOATING CHAT BUTTON -->
+<a href="#servicos" class="float-btn" aria-label="Falar agora">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</a>
+
+</body>
+</html>
