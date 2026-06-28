@@ -1,634 +1,1206 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ONG da Paz | Ajuda às Vítimas do Terremoto na Venezuela</title>
-  <meta name="description" content="Doe agora e ajude as vítimas do terremoto na Venezuela. A ONG da Paz está enviando doações de brasileiros diretamente para quem mais precisa." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ONG da Paz | Ajuda Humanitária — Venezuela</title>
+  <meta name="description" content="A ONG da Paz conecta doadores brasileiros a famílias venezolanas em situação de emergência. Doe via PIX de forma rápida, segura e transparente."/>
+  <meta name="keywords" content="ONG, doação, Venezuela, ajuda humanitária, PIX, solidariedade, terremoto"/>
+  <meta property="og:title" content="ONG da Paz — Doe Agora"/>
+  <meta property="og:description" content="Sua doação salva vidas. Contribua via PIX e ajude famílias venezuelanas."/>
+  <meta property="og:type" content="website"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><circle cx='30' cy='30' r='30' fill='%231B5E8C'/><ellipse cx='33' cy='26' rx='9' ry='6' fill='white' transform='rotate(-15 33 26)'/><circle cx='41' cy='21' r='4' fill='white'/><path d='M45 20 L49 21 L45 22z' fill='%23F59E0B'/><circle cx='42' cy='20' r='1' fill='%231B5E8C'/><path d='M24 29 L18 33 L21 27z' fill='white'/><path d='M30 20 Q35 13 41 18' stroke='white' stroke-width='2' fill='none' stroke-linecap='round'/><path d='M20 38 Q29 32 39 36' stroke='%234CAF50' stroke-width='2' fill='none' stroke-linecap='round'/><ellipse cx='23' cy='37' rx='3' ry='1.8' fill='%234CAF50' transform='rotate(-30 23 37)'/><ellipse cx='28' cy='34' rx='3' ry='1.8' fill='%234CAF50' transform='rotate(-15 28 34)'/><ellipse cx='33' cy='33' rx='3' ry='1.8' fill='%234CAF50'/><ellipse cx='38' cy='35' rx='3' ry='1.8' fill='%234CAF50' transform='rotate(20 38 35)'/></svg>"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 
-    :root {
-      --green:      #1A7A3C;
-      --green-mid:  #22944A;
-      --green-lt:   #D6F0DF;
-      --yellow:     #F5C518;
-      --yellow-lt:  #FFF8DC;
-      --red:        #C0392B;
-      --blue:       #1A3A7A;
-      --text:       #1A1A1A;
-      --text-muted: #5A5A5A;
-      --border:     #E0E0E0;
-      --bg:         #F8F9FA;
-      --white:      #FFFFFF;
-      --radius:     16px;
-    }
+<style>
+/* ═══════════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════════ */
+:root{
+  --blue:#1B5E8C; --blue-dark:#134b73; --blue-mid:#2072a7;
+  --blue-lt:#E8F4FD; --blue-card:#D0E8F5;
+  --green:#4CAF50; --green-dark:#388E3C; --green-lt:#E8F5E9;
+  --gold:#F59E0B; --gold-lt:#FEF3C7;
+  --text:#111827; --muted:#6B7280; --subtle:#9CA3AF;
+  --border:#E5E7EB; --bg:#F9FAFB; --white:#FFFFFF;
+  --radius:16px; --radius-sm:10px; --radius-xs:8px;
+  --shadow:0 4px 24px rgba(0,0,0,.08);
+  --shadow-lg:0 12px 48px rgba(0,0,0,.14);
+  --trans:.25s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Inter',sans-serif;color:var(--text);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+ul{list-style:none}
+input,textarea{font-family:inherit}
 
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      background: var(--white);
-      -webkit-font-smoothing: antialiased;
-    }
+/* ═══════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════ */
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.section{padding:80px 0}
+.section--gray{background:var(--bg)}
+.section--blue{background:var(--blue-lt)}
+.label{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+.label--white{color:rgba(255,255,255,.7)}
+.h1{font-size:clamp(34px,6vw,60px);font-weight:900;line-height:1.1;letter-spacing:-.5px}
+.h2{font-size:clamp(26px,4vw,40px);font-weight:800;line-height:1.2;letter-spacing:-.3px}
+.h3{font-size:clamp(18px,2.5vw,22px);font-weight:700;line-height:1.3}
+.lead{font-size:18px;line-height:1.75;color:var(--muted)}
+.center{text-align:center}
+.center .lead{max-width:620px;margin-left:auto;margin-right:auto}
 
-    /* ── NAVBAR ───────────────────────────────── */
-    .nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,0.97);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 20px;
-    }
-    .nav__inner {
-      max-width: 1000px; margin: 0 auto;
-      height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav__logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav__logo-text strong { display: block; font-size: 16px; font-weight: 900; color: var(--green); letter-spacing: 0.5px; }
-    .nav__logo-text span { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; }
-    .nav__btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--green); color: white;
-      font-size: 14px; font-weight: 700;
-      padding: 10px 22px; border-radius: 50px;
-      text-decoration: none; transition: background 0.2s;
-    }
-    .nav__btn:hover { background: var(--green-mid); }
+/* ═══════════════════════════════════════════
+   SCROLL ANIMATIONS
+═══════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .6s var(--trans),transform .6s var(--trans)}
+.reveal.visible{opacity:1;transform:none}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
 
-    /* ── URGENCY BANNER ───────────────────────── */
-    .urgency {
-      background: var(--red);
-      padding: 10px 20px;
-      text-align: center;
-    }
-    .urgency p {
-      font-size: 13px; font-weight: 700; color: white;
-      letter-spacing: 0.3px;
-      display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
-    }
-    .urgency__dot {
-      display: inline-block; width: 8px; height: 8px;
-      background: #FF8888; border-radius: 50%;
-      animation: blink 1.2s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+/* ═══════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:700;padding:14px 28px;border-radius:50px;transition:var(--trans);cursor:pointer;border:none;font-family:inherit;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);opacity:0;transition:opacity .2s}
+.btn:hover::after{opacity:1}
+.btn:active{transform:scale(.97)}
+.btn-blue{background:var(--blue);color:white;box-shadow:0 4px 16px rgba(27,94,140,.3)}
+.btn-blue:hover{background:var(--blue-mid);box-shadow:0 8px 28px rgba(27,94,140,.4);transform:translateY(-2px)}
+.btn-green{background:var(--green);color:white;box-shadow:0 4px 16px rgba(76,175,80,.3)}
+.btn-green:hover{background:var(--green-dark);transform:translateY(-2px);box-shadow:0 8px 28px rgba(76,175,80,.4)}
+.btn-gold{background:var(--gold);color:#111;box-shadow:0 4px 16px rgba(245,158,11,.3)}
+.btn-gold:hover{background:#d97706;transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,158,11,.4)}
+.btn-outline{background:transparent;color:white;border:2px solid rgba(255,255,255,.5)}
+.btn-outline:hover{background:rgba(255,255,255,.1);border-color:white}
+.btn-lg{font-size:17px;padding:18px 40px}
+.btn-sm{font-size:13px;padding:10px 20px}
 
-    /* ── HERO ─────────────────────────────────── */
-    .hero {
-      background: linear-gradient(160deg, #0d2c18 0%, #1A7A3C 55%, #22944A 100%);
-      padding: 60px 20px 64px;
-      position: relative; overflow: hidden;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, #009c3b, #ffdf00, #009c3b);
-    }
-    .hero__inner { max-width: 720px; margin: 0 auto; }
+/* ═══════════════════════════════════════════
+   URGENCY BAR
+═══════════════════════════════════════════ */
+.urgency-bar{background:linear-gradient(90deg,#B91C1C,#DC2626);padding:10px 24px;text-align:center}
+.urgency-bar p{font-size:13px;font-weight:700;color:white;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.pulse-dot{width:8px;height:8px;background:#FCA5A5;border-radius:50%;display:inline-block;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
 
-    /* LOGO SVG */
-    .logo-svg-wrap {
-      display: flex; align-items: center; gap: 14px;
-      margin-bottom: 32px;
-    }
-    .logo-text-block strong {
-      display: block; font-size: 22px; font-weight: 900;
-      color: white; letter-spacing: 1px; line-height: 1;
-    }
-    .logo-text-block span {
-      font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.65);
-      letter-spacing: 2px; text-transform: uppercase;
-    }
+/* ═══════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════ */
+.nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav__inner{max-width:1200px;margin:0 auto;padding:0 24px;height:70px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.nav__logo{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.nav__logo-text strong{display:block;font-size:17px;font-weight:900;color:var(--blue);letter-spacing:.5px}
+.nav__logo-text span{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.nav__menu{display:flex;align-items:center;gap:4px}
+.nav__link{font-size:14px;font-weight:600;color:var(--muted);padding:8px 14px;border-radius:8px;transition:var(--trans)}
+.nav__link:hover{color:var(--blue);background:var(--blue-lt)}
+.nav__actions{display:flex;align-items:center;gap:10px}
+.hamburger{display:none;flex-direction:column;gap:5px;padding:8px;border-radius:8px;background:transparent;border:none;cursor:pointer}
+.hamburger span{display:block;width:24px;height:2px;background:var(--text);border-radius:2px;transition:var(--trans)}
+.mobile-menu{display:none;position:fixed;inset:0;background:white;z-index:300;flex-direction:column;padding:24px}
+.mobile-menu.open{display:flex}
+.mobile-menu__header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.mobile-menu__close{font-size:28px;background:none;border:none;cursor:pointer;color:var(--text)}
+.mobile-menu__nav{display:flex;flex-direction:column;gap:4px;flex:1}
+.mobile-menu__link{font-size:18px;font-weight:700;color:var(--text);padding:16px;border-radius:12px;border-bottom:1px solid var(--border)}
+.mobile-menu__link:hover{background:var(--bg);color:var(--blue)}
+@media(max-width:900px){.nav__menu{display:none}.hamburger{display:flex}}
+@media(max-width:600px){.nav__actions .btn-sm{display:none}}
 
-    .hero__eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 600;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      padding: 6px 16px; border-radius: 50px; margin-bottom: 22px;
-    }
-    .hero__title {
-      font-size: clamp(30px, 7vw, 50px);
-      font-weight: 900; color: white; line-height: 1.15;
-      letter-spacing: -0.5px; margin-bottom: 18px;
-    }
-    .hero__title .yellow { color: var(--yellow); }
-    .hero__sub {
-      font-size: 17px; color: rgba(255,255,255,0.85);
-      line-height: 1.7; margin-bottom: 36px; max-width: 560px;
-    }
-    .hero__actions { display: flex; gap: 12px; flex-wrap: wrap; }
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero{background:linear-gradient(140deg,#0d3554 0%,#1B5E8C 50%,#1e7abf 100%);padding:80px 0 88px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M0 0h40v40H0zm40 40h40v40H40z'/%3E%3C/g%3E%3C/svg%3E")}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#009c3b,#ffdf00,#002776,#009c3b)}
+.hero__inner{max-width:780px;margin:0 auto;padding:0 24px;position:relative;text-align:center}
+.hero__badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.9);font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:7px 18px;border-radius:50px;margin-bottom:24px}
+.hero__title{color:white;margin-bottom:20px}
+.hero__title .highlight{color:var(--gold)}
+.hero__sub{font-size:18px;color:rgba(255,255,255,.82);line-height:1.75;margin-bottom:40px;max-width:580px;margin-left:auto;margin-right:auto}
+.hero__ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero__trust{display:flex;align-items:center;justify-content:center;gap:24px;margin-top:48px;flex-wrap:wrap}
+.hero__trust-item{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:500}
+.hero__trust-item svg{width:16px;height:16px;flex-shrink:0}
+.hero__sep{width:1px;height:18px;background:rgba(255,255,255,.2)}
 
-    .btn-donate {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: var(--yellow); color: #1A1A1A;
-      font-size: 16px; font-weight: 800;
-      padding: 16px 32px; border-radius: 50px;
-      text-decoration: none;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.25);
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .btn-donate:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(0,0,0,0.3); }
-    .btn-secondary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,0.15);
-      border: 1.5px solid rgba(255,255,255,0.4);
-      color: white; font-size: 15px; font-weight: 600;
-      padding: 16px 28px; border-radius: 50px;
-      text-decoration: none; transition: background 0.2s;
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.25); }
+/* ═══════════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════════ */
+.progress-section{background:var(--blue-dark);padding:32px 0}
+.progress-inner{max-width:800px;margin:0 auto;padding:0 24px}
+.progress-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.progress-label{font-size:14px;font-weight:600;color:rgba(255,255,255,.7)}
+.progress-values{font-size:13px;color:rgba(255,255,255,.5)}
+.progress-values strong{color:var(--gold);font-size:20px;font-weight:800}
+.progress-track{height:12px;background:rgba(255,255,255,.1);border-radius:12px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),#81C784);border-radius:12px;width:0;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.progress-footer{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:rgba(255,255,255,.4)}
 
-    /* ── PHOTO GRID ───────────────────────────── */
-    .photos {
-      background: #111;
-      padding: 0;
-    }
-    .photos__grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-      max-width: 1000px; margin: 0 auto;
-    }
-    .photo-slot {
-      aspect-ratio: 4/3;
-      background: #222;
-      position: relative;
-      overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .photo-slot img {
-      width: 100%; height: 100%; object-fit: cover;
-      display: block; filter: brightness(0.85);
-      transition: transform 0.4s;
-    }
-    .photo-slot:hover img { transform: scale(1.04); }
-    .photo-slot__placeholder {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 10px;
-      color: rgba(255,255,255,0.3); font-size: 13px; text-align: center;
-      padding: 16px;
-    }
-    .photo-slot__placeholder svg { width: 32px; height: 32px; opacity: 0.4; }
-    .photo-caption {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.7));
-      padding: 20px 12px 10px;
-      color: white; font-size: 11px; font-weight: 500; text-align: center;
-    }
-    @media (max-width: 600px) {
-      .photos__grid { grid-template-columns: repeat(2, 1fr); }
-      .photo-slot:last-child { display: none; }
-    }
+/* ═══════════════════════════════════════════
+   IMPACT COUNTERS
+═══════════════════════════════════════════ */
+.impact{background:white;padding:64px 0;border-bottom:1px solid var(--border)}
+.impact__grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+@media(max-width:700px){.impact__grid{grid-template-columns:repeat(2,1fr)}}
+.impact-card{padding:32px 24px;text-align:center;border-right:1px solid var(--border);position:relative}
+.impact-card:last-child{border-right:none}
+@media(max-width:700px){.impact-card:nth-child(2){border-right:none}.impact-card:nth-child(3){border-right:1px solid var(--border)}.impact-card:nth-child(n+3){border-top:1px solid var(--border)}}
+.impact-card__num{font-size:clamp(36px,5vw,52px);font-weight:900;color:var(--blue);line-height:1;margin-bottom:8px}
+.impact-card__label{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.impact-card__icon{font-size:28px;margin-bottom:12px}
 
-    /* ── IMPACT ───────────────────────────────── */
-    .impact {
-      background: #111; padding: 32px 20px;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-    .impact__inner {
-      max-width: 800px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-    }
-    @media (max-width: 500px) { .impact__inner { grid-template-columns: 1fr; } }
-    .impact-stat {
-      text-align: center; padding: 16px 8px;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; background: rgba(255,255,255,0.03);
-    }
-    .impact-stat__num { font-size: 28px; font-weight: 900; color: var(--yellow); margin-bottom: 4px; }
-    .impact-stat__label { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); letter-spacing: 0.5px; }
+/* ═══════════════════════════════════════════
+   ABOUT
+═══════════════════════════════════════════ */
+.about__grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+@media(max-width:800px){.about__grid{grid-template-columns:1fr}}
+.about__visual{position:relative}
+.about__img-frame{background:linear-gradient(135deg,var(--blue-lt),var(--green-lt));border-radius:var(--radius);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.about__img-frame img{width:100%;height:100%;object-fit:cover}
+.about__img-placeholder{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--muted)}
+.about__img-placeholder svg{width:48px;height:48px;opacity:.4}
+.about__badge{position:absolute;bottom:-20px;right:-20px;background:var(--blue);color:white;padding:20px 24px;border-radius:var(--radius);text-align:center;box-shadow:var(--shadow-lg)}
+@media(max-width:600px){.about__badge{right:0;bottom:-16px}}
+.about__badge-num{font-size:32px;font-weight:900;line-height:1}
+.about__badge-label{font-size:11px;font-weight:600;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.about__text p{font-size:16px;color:var(--muted);line-height:1.85;margin-bottom:16px}
+.about__text p:last-child{margin-bottom:0}
+.about__text strong{color:var(--text);font-weight:700}
+.about__pillars{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.pillar{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;gap:12px;align-items:flex-start}
+.pillar__icon{width:36px;height:36px;background:var(--blue-lt);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.pillar__title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.pillar__desc{font-size:12px;color:var(--muted);line-height:1.5}
 
-    /* ── SECTION ──────────────────────────────── */
-    .section { padding: 64px 20px; }
-    .section--gray { background: var(--bg); }
-    .section__inner { max-width: 880px; margin: 0 auto; }
-    .section__label {
-      font-size: 11px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--green); margin-bottom: 10px;
-    }
-    .section__title {
-      font-size: clamp(24px, 5vw, 34px);
-      font-weight: 900; color: var(--text); line-height: 1.2;
-      letter-spacing: -0.3px; margin-bottom: 14px;
-    }
-    .section__sub {
-      font-size: 16px; color: var(--text-muted); line-height: 1.8;
-      max-width: 620px;
-    }
-    .section__header { margin-bottom: 40px; }
-    .section__header--center { text-align: center; }
-    .section__header--center .section__sub { margin: 0 auto; }
+/* ═══════════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════════ */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;position:relative}
+@media(max-width:700px){.how-grid{grid-template-columns:1fr}}
+.how-connector{position:absolute;top:40px;left:calc(33.33% - 20px);right:calc(33.33% - 20px);height:2px;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:2px;z-index:0}
+@media(max-width:700px){.how-connector{display:none}}
+.how-card{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:32px 24px;text-align:center;position:relative;z-index:1;transition:var(--trans)}
+.how-card:hover{border-color:var(--blue);box-shadow:0 8px 32px rgba(27,94,140,.1);transform:translateY(-4px)}
+.how-card__step{width:60px;height:60px;background:linear-gradient(135deg,var(--blue),var(--blue-mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:white;margin:0 auto 20px;box-shadow:0 6px 20px rgba(27,94,140,.3)}
+.how-card__title{font-size:17px;font-weight:700;margin-bottom:10px}
+.how-card__desc{font-size:14px;color:var(--muted);line-height:1.7}
 
-    /* ── ABOUT / STORY ────────────────────────── */
-    .story p {
-      font-size: 16px; color: var(--text-muted); line-height: 1.9;
-      margin-bottom: 18px;
-    }
-    .story p strong { color: var(--text); font-weight: 700; }
-    .story p:last-child { margin-bottom: 0; }
+/* ═══════════════════════════════════════════
+   TRANSPARENCY
+═══════════════════════════════════════════ */
+.transp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:700px){.transp-grid{grid-template-columns:1fr}}
+.transp-card{background:white;border-radius:var(--radius);padding:28px 24px;border:1.5px solid var(--border);display:flex;flex-direction:column;gap:12px;transition:var(--trans)}
+.transp-card:hover{border-color:var(--blue);box-shadow:var(--shadow)}
+.transp-card__icon{width:48px;height:48px;background:var(--blue-lt);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.transp-card__title{font-size:16px;font-weight:700}
+.transp-card__desc{font-size:14px;color:var(--muted);line-height:1.6}
+.transp-card__tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--green-dark);background:var(--green-lt);padding:5px 12px;border-radius:50px;width:fit-content}
 
-    /* ── DONATION BOX ─────────────────────────── */
-    .donate-box {
-      background: white;
-      border: 2px solid var(--green);
-      border-radius: var(--radius);
-      padding: 36px 32px;
-      max-width: 540px; margin: 0 auto;
-      box-shadow: 0 8px 40px rgba(26,122,60,0.12);
-    }
-    .donate-box__title {
-      font-size: 22px; font-weight: 900;
-      color: var(--text); text-align: center; margin-bottom: 6px;
-    }
-    .donate-box__sub {
-      font-size: 14px; color: var(--text-muted);
-      text-align: center; margin-bottom: 28px; line-height: 1.5;
-    }
+/* ═══════════════════════════════════════════
+   DONATION
+═══════════════════════════════════════════ */
+.donate-wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+@media(max-width:800px){.donate-wrap{grid-template-columns:1fr}}
+.donate-box{background:white;border-radius:var(--radius);box-shadow:0 12px 48px rgba(27,94,140,.15);overflow:hidden;border:2px solid var(--blue)}
+.donate-box__header{background:linear-gradient(135deg,var(--blue),var(--blue-mid));padding:28px 32px;text-align:center}
+.donate-box__header h3{font-size:22px;font-weight:800;color:white;margin-bottom:4px}
+.donate-box__header p{font-size:14px;color:rgba(255,255,255,.75)}
+.donate-box__body{padding:28px 32px}
+.amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.amount-btn{background:white;border:2px solid var(--border);border-radius:var(--radius-xs);padding:14px 8px;text-align:center;cursor:pointer;transition:var(--trans);font-family:inherit}
+.amount-btn:hover,.amount-btn.active{border-color:var(--blue);background:var(--blue-lt)}
+.amount-btn.active .amount-val{color:var(--blue)}
+.amount-val{display:block;font-size:20px;font-weight:800;color:var(--text);line-height:1}
+.amount-tag{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.amounts-row2{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.pix-area{background:linear-gradient(135deg,var(--blue-lt),#dbeeff);border-radius:var(--radius-sm);padding:28px;text-align:center;border:2px dashed var(--blue-card);margin-bottom:20px}
+.pix-area__label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+.pix-key-box{background:white;border:1.5px solid var(--blue-card);border-radius:var(--radius-xs);padding:12px 16px;font-size:16px;font-weight:700;color:var(--text);word-break:break-all;margin-bottom:8px}
+.pix-area__hint{font-size:12px;color:var(--muted)}
+.copy-btn{display:flex;width:100%;align-items:center;justify-content:center;gap:10px;background:var(--blue);color:white;font-size:16px;font-weight:800;padding:18px;border-radius:50px;border:none;cursor:pointer;font-family:inherit;transition:var(--trans);margin-bottom:14px}
+.copy-btn:hover{background:var(--blue-mid);transform:translateY(-2px);box-shadow:0 8px 28px rgba(27,94,140,.35)}
+.copy-btn.copied{background:var(--green-dark)}
+.donate-note{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--muted)}
+.donate-note svg{width:14px;height:14px;color:var(--green)}
+.donate-info h3{font-size:24px;font-weight:800;margin-bottom:16px}
+.donate-info p{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:16px}
+.donate-steps{display:flex;flex-direction:column;gap:16px;margin-top:24px}
+.d-step{display:flex;gap:16px;align-items:flex-start}
+.d-step__num{width:36px;height:36px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white;flex-shrink:0}
+.d-step__title{font-size:15px;font-weight:700;margin-bottom:3px}
+.d-step__desc{font-size:13px;color:var(--muted);line-height:1.6}
 
-    /* PIX QR placeholder */
-    .pix-area {
-      background: var(--green-lt);
-      border: 2px dashed var(--green);
-      border-radius: 12px;
-      padding: 28px 20px; text-align: center;
-      margin-bottom: 20px;
-    }
-    .pix-area__icon { font-size: 40px; margin-bottom: 12px; }
-    .pix-key-label {
-      font-size: 12px; font-weight: 600; color: var(--green);
-      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;
-    }
-    .pix-key {
-      font-size: 18px; font-weight: 900; color: var(--text);
-      letter-spacing: 1px; word-break: break-all;
-      background: white; border-radius: 8px;
-      padding: 10px 14px; margin: 0 auto 14px;
-      border: 1.5px solid var(--border);
-      display: inline-block;
-    }
-    .pix-placeholder {
-      font-size: 14px; color: var(--text-muted);
-      font-style: italic;
-    }
+/* ═══════════════════════════════════════════
+   GALLERY
+═══════════════════════════════════════════ */
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.gallery-grid{grid-template-columns:repeat(2,1fr)}}
+.gallery-item{border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;position:relative;aspect-ratio:4/3;background:var(--bg);border:1.5px solid var(--border)}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.gallery-item:hover img{transform:scale(1.06)}
+.gallery-overlay{position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(0,0,0,.6));opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:14px}
+.gallery-item:hover .gallery-overlay{opacity:1}
+.gallery-overlay span{color:white;font-size:12px;font-weight:600}
+.gallery-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--muted);padding:16px;text-align:center;font-size:13px}
+.gallery-placeholder svg{width:32px;height:32px;opacity:.4}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.lightbox.open{display:flex}
+.lightbox__img{max-width:90vw;max-height:85vh;border-radius:12px;object-fit:contain}
+.lightbox__close{position:absolute;top:20px;right:24px;color:white;font-size:36px;cursor:pointer;background:rgba(255,255,255,.1);border:none;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.lightbox__close:hover{background:rgba(255,255,255,.25)}
+.lightbox__nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:white;font-size:24px;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s}
+.lightbox__nav:hover{background:rgba(255,255,255,.3)}
+.lightbox__prev{left:16px}
+.lightbox__next{right:16px}
+.lightbox__caption{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);font-size:13px;text-align:center}
 
-    .donate-amounts {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-      margin-bottom: 20px;
-    }
-    .amount-btn {
-      border: 2px solid var(--border);
-      border-radius: 10px; padding: 12px 8px;
-      text-align: center; cursor: pointer;
-      transition: all 0.15s; background: white;
-      font-family: 'Inter', sans-serif;
-    }
-    .amount-btn__value { font-size: 18px; font-weight: 800; color: var(--text); display: block; }
-    .amount-btn__label { font-size: 11px; color: var(--text-muted); margin-top: 2px; display: block; }
-    .amount-btn:hover, .amount-btn.active {
-      border-color: var(--green); background: var(--green-lt);
-    }
-    .amount-btn.active .amount-btn__value { color: var(--green); }
+/* ═══════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════ */
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:700px){.testimonials-grid{grid-template-columns:1fr}}
+.testimonial-card{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:28px 24px;display:flex;flex-direction:column;gap:16px;transition:var(--trans)}
+.testimonial-card:hover{border-color:var(--blue);box-shadow:var(--shadow)}
+.testimonial-stars{color:var(--gold);font-size:16px;letter-spacing:2px}
+.testimonial-text{font-size:15px;color:var(--muted);line-height:1.75;font-style:italic;flex:1}
+.testimonial-author{display:flex;align-items:center;gap:12px}
+.testimonial-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--blue-lt),var(--blue-card));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--blue);flex-shrink:0}
+.testimonial-name{font-size:14px;font-weight:700}
+.testimonial-role{font-size:12px;color:var(--muted)}
 
-    .donate-box__copy-btn {
-      display: block; width: 100%; padding: 16px;
-      background: var(--green); color: white;
-      font-size: 16px; font-weight: 800;
-      border: none; border-radius: 50px; cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: background 0.2s, transform 0.15s;
-      text-align: center; text-decoration: none;
-    }
-    .donate-box__copy-btn:hover { background: var(--green-mid); transform: translateY(-1px); }
+/* ═══════════════════════════════════════════
+   FAQ
+═══════════════════════════════════════════ */
+.faq-list{display:flex;flex-direction:column;gap:0;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-trigger{width:100%;background:white;border:none;padding:20px 24px;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;font-family:inherit;transition:background .2s}
+.faq-trigger:hover{background:var(--bg)}
+.faq-question{font-size:16px;font-weight:700;color:var(--text)}
+.faq-chevron{flex-shrink:0;width:20px;height:20px;border:2px solid var(--muted);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:var(--trans);color:var(--muted);font-size:12px}
+.faq-item.open .faq-chevron{background:var(--blue);border-color:var(--blue);color:white;transform:rotate(180deg)}
+.faq-item.open .faq-trigger{background:var(--blue-lt)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1),padding .3s}
+.faq-answer p{font-size:15px;color:var(--muted);line-height:1.8;padding:0 24px 20px}
+.faq-item.open .faq-answer{max-height:300px}
 
-    .donate-box__note {
-      text-align: center; margin-top: 14px;
-      font-size: 12px; color: var(--text-muted);
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .donate-box__note svg { width: 14px; height: 14px; color: var(--green); }
+/* ═══════════════════════════════════════════
+   FINAL CTA
+═══════════════════════════════════════════ */
+.cta-final{background:linear-gradient(140deg,#0d3554,#1B5E8C 60%,#1e7abf);padding:80px 0;text-align:center;position:relative;overflow:hidden}
+.cta-final::before{content:'';position:absolute;top:-50%;left:-20%;width:60%;height:200%;background:radial-gradient(ellipse,rgba(255,255,255,.05) 0%,transparent 70%)}
+.cta-final::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#009c3b,#ffdf00,#002776,#009c3b)}
+.cta-final h2{color:white;margin-bottom:16px}
+.cta-final p{font-size:18px;color:rgba(255,255,255,.8);margin-bottom:40px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.7}
+.cta-final__btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 
-    /* ── HOW WE HELP ──────────────────────────── */
-    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-    .step {
-      background: white; border: 1.5px solid var(--border);
-      border-radius: var(--radius); padding: 24px 20px;
-      display: flex; flex-direction: column; gap: 12px;
-    }
-    .step__num {
-      width: 44px; height: 44px; background: var(--green);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 900; color: white; flex-shrink: 0;
-    }
-    .step__title { font-size: 15px; font-weight: 700; color: var(--text); }
-    .step__desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+.footer{background:#0a1e30;padding:56px 0 32px}
+.footer__grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+@media(max-width:900px){.footer__grid{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.footer__grid{grid-template-columns:1fr}}
+.footer__brand p{font-size:14px;color:rgba(255,255,255,.45);line-height:1.75;margin:14px 0 20px}
+.footer__socials{display:flex;gap:10px;flex-wrap:wrap}
+.social-link{width:36px;height:36px;background:rgba(255,255,255,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:16px;transition:var(--trans)}
+.social-link:hover{background:var(--blue);color:white}
+.footer__col h4{font-size:12px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.footer__col ul{display:flex;flex-direction:column;gap:10px}
+.footer__col li a{font-size:14px;color:rgba(255,255,255,.5);transition:color .2s}
+.footer__col li a:hover{color:rgba(255,255,255,.9)}
+.footer__bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer__copy{font-size:12px;color:rgba(255,255,255,.25)}
+.footer__legal{display:flex;gap:20px}
+.footer__legal a{font-size:12px;color:rgba(255,255,255,.25);transition:color .2s}
+.footer__legal a:hover{color:rgba(255,255,255,.6)}
+.footer__logo-text strong{color:rgba(255,255,255,.9)}
+.footer__logo-text span{color:rgba(255,255,255,.4)}
 
-    /* ── FINAL CTA ────────────────────────────── */
-    .cta-block {
-      background: linear-gradient(150deg, #0d2c18 0%, #1A7A3C 100%);
-      padding: 64px 20px; text-align: center;
-      position: relative; overflow: hidden;
-    }
-    .cta-block::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, #009c3b, #ffdf00, #009c3b);
-    }
-    .cta-block__title {
-      font-size: clamp(26px, 5vw, 40px); font-weight: 900;
-      color: white; line-height: 1.2; margin-bottom: 14px;
-      letter-spacing: -0.3px;
-    }
-    .cta-block__sub {
-      font-size: 16px; color: rgba(255,255,255,0.8);
-      line-height: 1.7; margin-bottom: 36px; max-width: 520px; margin-left: auto; margin-right: auto;
-    }
+/* ═══════════════════════════════════════════
+   FLOATING BUTTON
+═══════════════════════════════════════════ */
+.float-btn{position:fixed;bottom:24px;right:24px;z-index:150;background:var(--gold);color:#111;font-size:15px;font-weight:800;padding:16px 28px;border-radius:50px;text-decoration:none;box-shadow:0 8px 28px rgba(245,158,11,.4);display:flex;align-items:center;gap:8px;transition:var(--trans);animation:float-in .5s .8s both}
+@keyframes float-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.float-btn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(245,158,11,.5)}
+@media(max-width:500px){.float-btn{bottom:16px;right:16px;padding:14px 22px;font-size:14px}}
 
-    /* ── FOOTER ───────────────────────────────── */
-    .footer {
-      background: #0a1a0f; padding: 32px 20px; text-align: center;
-    }
-    .footer__copy {
-      font-size: 12px; color: rgba(255,255,255,0.3); line-height: 1.7;
-    }
-    .footer__copy a { color: rgba(255,255,255,0.5); }
-
-    /* ── FLOAT ────────────────────────────────── */
-    .float-donate {
-      position: fixed; bottom: 20px; right: 20px; z-index: 90;
-      background: var(--yellow); color: #1A1A1A;
-      font-size: 14px; font-weight: 800;
-      padding: 14px 24px; border-radius: 50px;
-      text-decoration: none;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.25);
-      display: flex; align-items: center; gap: 8px;
-      transition: transform 0.2s, box-shadow 0.2s;
-      animation: bounce 2s ease-in-out 3s 2;
-    }
-    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-    .float-donate:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,0.3); }
-  </style>
+/* ═══════════════════════════════════════════
+   LOGO SVG INLINE
+═══════════════════════════════════════════ */
+.logo-svg{width:46px;height:46px;flex-shrink:0}
+.logo-sm{width:36px;height:36px}
+</style>
 </head>
 <body>
 
-<!-- URGENCY BANNER -->
-<div class="urgency">
+<!-- ══════════════════════════════════════ -->
+<!-- URGENCY BAR                           -->
+<!-- ══════════════════════════════════════ -->
+<div class="urgency-bar">
   <p>
-    <span class="urgency__dot"></span>
-    EMERGÊNCIA ATIVA &mdash; Terremoto na Venezuela &mdash; Doe agora e salve vidas
-    <span class="urgency__dot"></span>
+    <span class="pulse-dot"></span>
+    EMERGÊNCIA ATIVA — Terremoto na Venezuela — Doe agora e salve vidas
+    <span class="pulse-dot"></span>
   </p>
 </div>
 
-<!-- NAVBAR -->
+<!-- ══════════════════════════════════════ -->
+<!-- NAVBAR                                -->
+<!-- ══════════════════════════════════════ -->
 <nav class="nav">
   <div class="nav__inner">
     <a href="#" class="nav__logo">
-      <!-- LOGO SVG ONG DA PAZ -->
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="22" cy="22" r="22" fill="#1A7A3C"/>
-        <!-- mãos em forma de coração / suporte -->
-        <path d="M11 28c0-2 1.5-3.5 3.5-3.5S18 26 18 26s1-2 4-2 4 2 4 2 1.5-1.5 3.5-1.5S33 26 33 28c0 3-5 8-11 10C16 36 11 31 11 28z" fill="white" opacity="0.95"/>
-        <!-- pomba simplificada -->
-        <ellipse cx="22" cy="14" rx="5" ry="3.5" fill="white" opacity="0.9"/>
-        <path d="M22 14 L30 11 L27 16z" fill="white" opacity="0.8"/>
-        <circle cx="24" cy="13" r="0.8" fill="#1A7A3C"/>
-        <!-- folha / ramo de oliveira -->
-        <path d="M14 17 Q18 14 22 17" stroke="#F5C518" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-        <circle cx="15" cy="17" r="1.2" fill="#F5C518"/>
-        <circle cx="18.5" cy="15" r="1.2" fill="#F5C518"/>
+      <!-- LOGO ONG DA PAZ -->
+      <svg class="logo-svg" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="30" r="30" fill="#1B5E8C"/>
+        <circle cx="30" cy="30" r="29" stroke="rgba(255,255,255,0.2)" stroke-width=".8"/>
+        <!-- Pomba corpo -->
+        <ellipse cx="33" cy="26" rx="9.5" ry="6.5" fill="white" transform="rotate(-15 33 26)"/>
+        <!-- Cabeça -->
+        <circle cx="41" cy="21" r="4.5" fill="white"/>
+        <!-- Bico com ramo -->
+        <path d="M45 20.5 L50 21.5 L45 22.5z" fill="#F59E0B"/>
+        <!-- Asa superior -->
+        <path d="M29 19 Q35 11 42 17" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <!-- Cauda -->
+        <path d="M24 29.5 L17 35 L20 27z" fill="white" opacity=".9"/>
+        <!-- Olho -->
+        <circle cx="42.5" cy="20" r="1.2" fill="#1B5E8C"/>
+        <!-- Ramo de oliveira -->
+        <path d="M18 40 Q27 33 40 38" stroke="#4CAF50" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="20.5" cy="39.5" rx="3.2" ry="1.9" fill="#4CAF50" transform="rotate(-35 20.5 39.5)"/>
+        <ellipse cx="25.5" cy="36" rx="3.2" ry="1.9" fill="#4CAF50" transform="rotate(-20 25.5 36)"/>
+        <ellipse cx="30.5" cy="34.5" rx="3.2" ry="1.9" fill="#4CAF50" transform="rotate(-8 30.5 34.5)"/>
+        <ellipse cx="35.5" cy="35.5" rx="3.2" ry="1.9" fill="#4CAF50" transform="rotate(12 35.5 35.5)"/>
+        <ellipse cx="39.5" cy="37.5" rx="3.2" ry="1.9" fill="#4CAF50" transform="rotate(22 39.5 37.5)"/>
       </svg>
       <div class="nav__logo-text">
-        <strong>ONG DA PAZ</strong>
+        <strong>ONG da Paz</strong>
         <span>Solidariedade Brasil</span>
       </div>
     </a>
-    <a href="#doar" class="nav__btn">❤️ Doe Agora</a>
+
+    <nav class="nav__menu" role="navigation" aria-label="Menu principal">
+      <a href="#sobre" class="nav__link">Sobre</a>
+      <a href="#missao" class="nav__link">Missão</a>
+      <a href="#transparencia" class="nav__link">Transparência</a>
+      <a href="#galeria" class="nav__link">Galeria</a>
+      <a href="#contato" class="nav__link">Contato</a>
+    </nav>
+
+    <div class="nav__actions">
+      <a href="#doar" class="btn btn-blue btn-sm">❤️ DOAR AGORA</a>
+      <button class="hamburger" id="hamburger" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu mobile">
+  <div class="mobile-menu__header">
+    <a href="#" class="nav__logo" onclick="closeMobile()">
+      <svg class="logo-sm" viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="30" fill="#1B5E8C"/><ellipse cx="33" cy="26" rx="9.5" ry="6.5" fill="white" transform="rotate(-15 33 26)"/><circle cx="41" cy="21" r="4.5" fill="white"/><path d="M45 20.5 L50 21.5 L45 22.5z" fill="#F59E0B"/><path d="M24 29.5 L17 35 L20 27z" fill="white" opacity=".9"/><path d="M18 40 Q27 33 40 38" stroke="#4CAF50" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="25" cy="36" rx="3" ry="1.8" fill="#4CAF50" transform="rotate(-20 25 36)"/><ellipse cx="31" cy="34" rx="3" ry="1.8" fill="#4CAF50"/><ellipse cx="37" cy="36" rx="3" ry="1.8" fill="#4CAF50" transform="rotate(15 37 36)"/></svg>
+      <div class="nav__logo-text"><strong>ONG da Paz</strong><span>Solidariedade Brasil</span></div>
+    </a>
+    <button class="mobile-menu__close" id="menuClose" aria-label="Fechar menu">✕</button>
+  </div>
+  <nav class="mobile-menu__nav">
+    <a href="#sobre" class="mobile-menu__link" onclick="closeMobile()">Sobre</a>
+    <a href="#missao" class="mobile-menu__link" onclick="closeMobile()">Missão</a>
+    <a href="#transparencia" class="mobile-menu__link" onclick="closeMobile()">Transparência</a>
+    <a href="#galeria" class="mobile-menu__link" onclick="closeMobile()">Galeria</a>
+    <a href="#faq" class="mobile-menu__link" onclick="closeMobile()">Perguntas Frequentes</a>
+    <a href="#contato" class="mobile-menu__link" onclick="closeMobile()">Contato</a>
+  </nav>
+  <a href="#doar" class="btn btn-blue btn-lg" style="margin-top:24px" onclick="closeMobile()">❤️ DOAR AGORA</a>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- HERO                                  -->
+<!-- ══════════════════════════════════════ -->
 <section class="hero">
   <div class="hero__inner">
-    <!-- Logo grande no hero -->
-    <div class="logo-svg-wrap">
-      <svg width="64" height="64" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="22" cy="22" r="22" fill="rgba(255,255,255,0.15)"/>
-        <circle cx="22" cy="22" r="21" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
-        <path d="M11 28c0-2 1.5-3.5 3.5-3.5S18 26 18 26s1-2 4-2 4 2 4 2 1.5-1.5 3.5-1.5S33 26 33 28c0 3-5 8-11 10C16 36 11 31 11 28z" fill="white" opacity="0.95"/>
-        <ellipse cx="22" cy="14" rx="5" ry="3.5" fill="white" opacity="0.9"/>
-        <path d="M22 14 L30 11 L27 16z" fill="white" opacity="0.8"/>
-        <circle cx="24" cy="13" r="0.8" fill="rgba(26,122,60,0.8)"/>
-        <path d="M14 17 Q18 14 22 17" stroke="#F5C518" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-        <circle cx="15" cy="17" r="1.2" fill="#F5C518"/>
-        <circle cx="18.5" cy="15" r="1.2" fill="#F5C518"/>
-      </svg>
-      <div class="logo-text-block">
-        <strong>ONG DA PAZ</strong>
-        <span>Solidariedade Brasil &rarr; Venezuela</span>
-      </div>
-    </div>
-
-    <div class="hero__eyebrow">🚨 Situação de emergência</div>
-    <h1 class="hero__title">
-      A Venezuela precisa<br>da nossa <span class="yellow">ajuda agora.</span>
+    <div class="hero__badge reveal">🚨 Situação de Emergência — Venezuela 2025</div>
+    <h1 class="h1 hero__title reveal">
+      Juntos podemos<br><span class="highlight">transformar vidas.</span>
     </h1>
-    <p class="hero__sub">
-      Um terremoto devastou comunidades inteiras na Venezuela. Famílias perderam tudo. A ONG da Paz está coletando doações de brasileiros e enviando diretamente para quem mais precisa — com transparência e responsabilidade.
+    <p class="hero__sub reveal reveal-delay-1">
+      Sua contribuição ajuda a levar assistência humanitária às famílias venezuelanas afetadas pelo terremoto. Doe via PIX de forma rápida, segura e com total transparência.
     </p>
-    <div class="hero__actions">
-      <a href="#doar" class="btn-donate">💛 Quero Doar Agora</a>
-      <a href="#sobre" class="btn-secondary">Saiba mais</a>
+    <div class="hero__ctas reveal reveal-delay-2">
+      <a href="#doar" class="btn btn-gold btn-lg">💛 QUERO DOAR</a>
+      <a href="#sobre" class="btn btn-outline btn-lg">Conheça nossa missão</a>
     </div>
-  </div>
-</section>
-
-<!-- PHOTO GRID (imagens do terremoto) -->
-<div class="photos">
-  <div class="photos__grid">
-    <div class="photo-slot">
-      <div class="photo-slot__placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span>Foto 1<br>será inserida aqui</span>
-      </div>
-      <div class="photo-caption">Terremoto — Venezuela 2025</div>
-    </div>
-    <div class="photo-slot">
-      <div class="photo-slot__placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span>Foto 2<br>será inserida aqui</span>
-      </div>
-      <div class="photo-caption">Famílias desabrigadas</div>
-    </div>
-    <div class="photo-slot">
-      <div class="photo-slot__placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span>Foto 3<br>será inserida aqui</span>
-      </div>
-      <div class="photo-caption">Ajuda humanitária em ação</div>
-    </div>
-  </div>
-</div>
-
-<!-- IMPACT NUMBERS -->
-<div class="impact">
-  <div class="impact__inner">
-    <div class="impact-stat">
-      <div class="impact-stat__num">+3.000</div>
-      <div class="impact-stat__label">Pessoas afetadas</div>
-    </div>
-    <div class="impact-stat">
-      <div class="impact-stat__num">Urgente</div>
-      <div class="impact-stat__label">Abrigo e alimentação</div>
-    </div>
-    <div class="impact-stat">
-      <div class="impact-stat__num">100%</div>
-      <div class="impact-stat__label">Das doações vão direto</div>
-    </div>
-  </div>
-</div>
-
-<!-- ABOUT / STORY -->
-<section class="section" id="sobre">
-  <div class="section__inner">
-    <div class="section__header">
-      <div class="section__label">O que aconteceu</div>
-      <h2 class="section__title">Um terremoto que devastou vidas em segundos</h2>
-    </div>
-    <div class="story">
-      <p>Na última semana, <strong>um forte terremoto sacudiu a Venezuela</strong>, causando destruição em diversas comunidades. Casas desmoronaram, famílias ficaram desabrigadas e a infraestrutura local foi gravemente afetada.</p>
-      <p>Em meio ao caos, <strong>há crianças, idosos e famílias inteiras sem abrigo, sem comida e sem acesso a água potável</strong>. A situação é crítica e cada hora conta.</p>
-      <p>A <strong>ONG da Paz</strong> foi criada por brasileiros que acreditam em solidariedade sem fronteiras. Estamos mobilizados para arrecadar doações aqui no Brasil e enviar ajuda concreta para quem está sofrendo na Venezuela — com total transparência sobre o uso de cada centavo recebido.</p>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="section section--gray">
-  <div class="section__inner">
-    <div class="section__header section__header--center">
-      <div class="section__label">Como funciona</div>
-      <h2 class="section__title">Sua doação vai direto para quem precisa</h2>
-      <p class="section__sub">Processo simples, transparente e seguro.</p>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step__num">1</div>
-        <div class="step__title">Você faz a doação via PIX</div>
-        <p class="step__desc">Rápido, sem taxa, direto pelo seu banco ou carteira digital.</p>
-      </div>
-      <div class="step">
-        <div class="step__num">2</div>
-        <div class="step__title">Convertemos e enviamos</div>
-        <p class="step__desc">As doações são convertidas e enviadas para a Venezuela por canais humanitários seguros.</p>
-      </div>
-      <div class="step">
-        <div class="step__num">3</div>
-        <div class="step__title">Prestamos contas</div>
-        <p class="step__desc">Publicamos relatórios periódicos com fotos, valores e como cada real foi usado.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- DONATION BOX -->
-<section class="section" id="doar">
-  <div class="section__inner">
-    <div class="section__header section__header--center">
-      <div class="section__label">Faça sua doação</div>
-      <h2 class="section__title">Qualquer valor faz a diferença</h2>
-      <p class="section__sub">R$20 garante uma refeição. R$50 ajuda uma família por um dia. R$100 salva vidas.</p>
-    </div>
-
-    <div class="donate-box">
-      <div class="donate-box__title">Doe via PIX</div>
-      <div class="donate-box__sub">Clique para copiar a chave e cole no seu banco</div>
-
-      <div class="donate-amounts">
-        <button class="amount-btn active" onclick="selectAmount(this)">
-          <span class="amount-btn__value">R$20</span>
-          <span class="amount-btn__label">1 refeição</span>
-        </button>
-        <button class="amount-btn" onclick="selectAmount(this)">
-          <span class="amount-btn__value">R$50</span>
-          <span class="amount-btn__label">Kit básico</span>
-        </button>
-        <button class="amount-btn" onclick="selectAmount(this)">
-          <span class="amount-btn__value">R$100</span>
-          <span class="amount-btn__label">Família segura</span>
-        </button>
-      </div>
-
-      <div class="pix-area">
-        <div class="pix-area__icon">🏦</div>
-        <div class="pix-key-label">Chave PIX</div>
-        <div class="pix-key" id="pix-key-display">lojablackacd@jim.com</div>
-        <div class="pix-placeholder">Envie o comprovante após a doação</div>
-      </div>
-
-      <button class="donate-box__copy-btn" onclick="copyPix()">
-        📋 Copiar Chave PIX
-      </button>
-
-      <div class="donate-box__note">
+    <div class="hero__trust reveal reveal-delay-3">
+      <div class="hero__trust-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Doação segura e transparente — ONG da Paz
+        Doação 100% segura
+      </div>
+      <div class="hero__sep"></div>
+      <div class="hero__trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Prestação de contas
+      </div>
+      <div class="hero__sep"></div>
+      <div class="hero__trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Atendimento humanizado
+      </div>
+      <div class="hero__sep"></div>
+      <div class="hero__trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Resposta em minutos
       </div>
     </div>
   </div>
 </section>
 
-<!-- FINAL CTA -->
-<section class="cta-block">
-  <div>
-    <h2 class="cta-block__title">Não deixe para depois.<br>Eles precisam agora.</h2>
-    <p class="cta-block__sub" style="margin-bottom:36px">Cada minuto conta para as famílias desabrigadas na Venezuela. Sua doação, por menor que seja, muda a realidade de alguém hoje.</p>
-    <a href="#doar" class="btn-donate">💛 Quero Ajudar Agora</a>
+<!-- ══════════════════════════════════════ -->
+<!-- CAMPAIGN PROGRESS                     -->
+<!-- ══════════════════════════════════════ -->
+<div class="progress-section">
+  <div class="progress-inner">
+    <div class="progress-header">
+      <span class="progress-label">Meta da campanha</span>
+      <span class="progress-values"><strong id="progressVal">R$0</strong> arrecadados de <span id="progressGoal">R$50.000</span></span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-footer">
+      <span id="progressPct">0% alcançado</span>
+      <span id="progressDays">Campanha ativa</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- IMPACT COUNTERS                       -->
+<!-- ══════════════════════════════════════ -->
+<section class="impact">
+  <div class="container">
+    <div class="impact__grid">
+      <div class="impact-card reveal">
+        <div class="impact-card__icon">🏠</div>
+        <div class="impact-card__num"><span class="counter" data-target="1240" data-suffix="+">0</span></div>
+        <div class="impact-card__label">Famílias atendidas</div>
+      </div>
+      <div class="impact-card reveal reveal-delay-1">
+        <div class="impact-card__icon">🤝</div>
+        <div class="impact-card__num"><span class="counter" data-target="85" data-suffix="">0</span></div>
+        <div class="impact-card__label">Voluntários</div>
+      </div>
+      <div class="impact-card reveal reveal-delay-2">
+        <div class="impact-card__icon">📋</div>
+        <div class="impact-card__num"><span class="counter" data-target="32" data-suffix="">0</span></div>
+        <div class="impact-card__label">Projetos realizados</div>
+      </div>
+      <div class="impact-card reveal reveal-delay-3">
+        <div class="impact-card__icon">📍</div>
+        <div class="impact-card__num"><span class="counter" data-target="8" data-suffix="">0</span></div>
+        <div class="impact-card__label">Regiões atendidas</div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <p class="footer__copy">
-    &copy; 2025 ONG da Paz — Solidariedade Brasil &rarr; Venezuela<br>
-    Organização humanitária independente. Doações com total transparência e prestação de contas.
-  </p>
+<!-- ══════════════════════════════════════ -->
+<!-- ABOUT                                 -->
+<!-- ══════════════════════════════════════ -->
+<section class="section" id="sobre">
+  <div class="container">
+    <div class="about__grid">
+      <div class="about__visual reveal">
+        <div class="about__img-frame">
+          <div class="about__img-placeholder" id="about-img">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Foto da ONG em ação</span>
+          </div>
+        </div>
+        <div class="about__badge">
+          <div class="about__badge-num">100%</div>
+          <div class="about__badge-label">Transparência</div>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div class="label">Quem somos</div>
+        <h2 class="h2" style="margin-bottom:20px">Apoio digital para quem<br>mais precisa</h2>
+        <div class="about__text">
+          <p>A <strong>ONG da Paz</strong> é uma organização humanitária independente criada por brasileiros comprometidos com a solidariedade sem fronteiras. Atuamos conectando doadores brasileiros a comunidades em situação de vulnerabilidade.</p>
+          <p>Com foco total em <strong>transparência e responsabilidade</strong>, cada centavo arrecadado é rastreado, reportado e direcionado diretamente para os beneficiários — sem intermediários desnecessários.</p>
+          <p>Nesta campanha, estamos mobilizados para apoiar famílias venezuelanas afetadas pelo terremoto desta semana, garantindo acesso a alimentação, abrigo e suprimentos básicos.</p>
+        </div>
+        <div class="about__pillars">
+          <div class="pillar">
+            <div class="pillar__icon">🎯</div>
+            <div><div class="pillar__title">Nossa Missão</div><div class="pillar__desc">Levar ajuda real a quem mais precisa, com agilidade e transparência.</div></div>
+          </div>
+          <div class="pillar">
+            <div class="pillar__icon">🌍</div>
+            <div><div class="pillar__title">Onde Atuamos</div><div class="pillar__desc">Brasil e América Latina, com foco em comunidades em emergência.</div></div>
+          </div>
+          <div class="pillar">
+            <div class="pillar__icon">💰</div>
+            <div><div class="pillar__title">Uso dos Recursos</div><div class="pillar__desc">100% das doações vão para as famílias. Operação custeada à parte.</div></div>
+          </div>
+          <div class="pillar">
+            <div class="pillar__icon">📊</div>
+            <div><div class="pillar__title">Prestação de Contas</div><div class="pillar__desc">Relatórios mensais públicos com comprovação de cada ação.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!-- MISSION                               -->
+<!-- ══════════════════════════════════════ -->
+<section class="section section--blue" id="missao">
+  <div class="container">
+    <div class="section__header center reveal" style="margin-bottom:48px">
+      <div class="label">Como funciona</div>
+      <h2 class="h2" style="margin-bottom:12px">Como sua doação chega<br>até quem precisa</h2>
+      <p class="lead">Processo simples, rápido e com total rastreabilidade.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-connector"></div>
+      <div class="how-card reveal">
+        <div class="how-card__step">1</div>
+        <h3 class="how-card__title">Você escolhe e doa</h3>
+        <p class="how-card__desc">Selecione o valor, copie a chave PIX e faça a transferência pelo seu banco ou carteira digital. Rápido e sem taxa.</p>
+      </div>
+      <div class="how-card reveal reveal-delay-1">
+        <div class="how-card__step">2</div>
+        <h3 class="how-card__title">Convertemos e enviamos</h3>
+        <p class="how-card__desc">As doações são convertidas e enviadas à Venezuela por canais humanitários verificados, com segurança e rastreabilidade.</p>
+      </div>
+      <div class="how-card reveal reveal-delay-2">
+        <div class="how-card__step">3</div>
+        <h3 class="how-card__title">Sua doação apoia vidas</h3>
+        <p class="how-card__desc">As famílias recebem alimentação, abrigo e suprimentos. Publicamos relatórios com fotos e comprovantes de cada entrega.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!-- TRANSPARENCY                          -->
+<!-- ══════════════════════════════════════ -->
+<section class="section" id="transparencia">
+  <div class="container">
+    <div class="center reveal" style="margin-bottom:48px">
+      <div class="label">Transparência</div>
+      <h2 class="h2" style="margin-bottom:12px">Você sabe exatamente<br>onde seu dinheiro vai</h2>
+      <p class="lead">Acreditamos que confiança se constrói com dados, não com promessas.</p>
+    </div>
+    <div class="transp-grid">
+      <div class="transp-card reveal">
+        <div class="transp-card__icon">📑</div>
+        <h3 class="h3">Relatórios Mensais</h3>
+        <p class="transp-card__desc">Publicamos relatórios detalhados com valores recebidos, convertidos e entregues — disponíveis para qualquer pessoa consultar.</p>
+        <div class="transp-card__tag">✓ Público e verificável</div>
+      </div>
+      <div class="transp-card reveal reveal-delay-1">
+        <div class="transp-card__icon">📷</div>
+        <h3 class="h3">Fotos das Ações</h3>
+        <p class="transp-card__desc">Cada entrega é documentada com fotos e vídeos, mostrando as famílias beneficiadas e os materiais distribuídos.</p>
+        <div class="transp-card__tag">✓ Comprovação visual</div>
+      </div>
+      <div class="transp-card reveal reveal-delay-2">
+        <div class="transp-card__icon">🤝</div>
+        <h3 class="h3">Parceiros Verificados</h3>
+        <p class="transp-card__desc">Trabalhamos com organizações locais na Venezuela que garantem a entrega das doações com segurança e responsabilidade.</p>
+        <div class="transp-card__tag">✓ Parceria certificada</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!-- DONATION                              -->
+<!-- ══════════════════════════════════════ -->
+<section class="section section--gray" id="doar">
+  <div class="container">
+    <div class="center reveal" style="margin-bottom:48px">
+      <div class="label">Faça sua doação</div>
+      <h2 class="h2" style="margin-bottom:12px">Qualquer valor<br>muda uma vida</h2>
+      <p class="lead">R$20 garante uma refeição. R$50 ajuda uma família por um dia. R$100 pode salvar vidas.</p>
+    </div>
+    <div class="donate-wrap">
+      <div class="donate-box reveal">
+        <div class="donate-box__header">
+          <h3>Doe via PIX agora</h3>
+          <p>Rápido, seguro e sem taxas para você</p>
+        </div>
+        <div class="donate-box__body">
+          <div class="amounts">
+            <button class="amount-btn active" onclick="selectAmount(this,'R$20','1 refeição')">
+              <span class="amount-val">R$20</span>
+              <span class="amount-tag">1 refeição</span>
+            </button>
+            <button class="amount-btn" onclick="selectAmount(this,'R$50','Kit básico')">
+              <span class="amount-val">R$50</span>
+              <span class="amount-tag">Kit básico</span>
+            </button>
+            <button class="amount-btn" onclick="selectAmount(this,'R$100','1 família/dia')">
+              <span class="amount-val">R$100</span>
+              <span class="amount-tag">1 família/dia</span>
+            </button>
+          </div>
+          <div class="amounts-row2">
+            <button class="amount-btn" onclick="selectAmount(this,'R$250','Kit emergência')">
+              <span class="amount-val">R$250</span>
+              <span class="amount-tag">Kit emergência</span>
+            </button>
+            <button class="amount-btn" onclick="selectAmount(this,'R$500','5 famílias')">
+              <span class="amount-val">R$500</span>
+              <span class="amount-tag">5 famílias</span>
+            </button>
+            <button class="amount-btn" onclick="openCustom(this)">
+              <span class="amount-val" style="font-size:14px">Outro</span>
+              <span class="amount-tag">Valor livre</span>
+            </button>
+          </div>
+
+          <div class="pix-area">
+            <div class="pix-area__label">Chave PIX (E-mail)</div>
+            <div class="pix-key-box" id="pixKey">lojablackacd@jim.com</div>
+            <div class="pix-area__hint">Copie a chave e cole no app do seu banco</div>
+          </div>
+
+          <button class="copy-btn" id="copyBtn" onclick="copyPix()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            COPIAR CHAVE PIX
+          </button>
+
+          <div class="donate-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Ambiente seguro — ONG da Paz · CNPJ: <span id="cnpj">XX.XXX.XXX/XXXX-XX</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="donate-info reveal reveal-delay-1">
+        <h3 class="h3" style="margin-bottom:12px">Por que doar com a ONG da Paz?</h3>
+        <p>Somos brasileiros ajudando venezuelanos. Cada real doado é convertido e enviado diretamente para as famílias afetadas pelo terremoto, com total rastreabilidade e transparência.</p>
+        <p>Após sua doação, envie o comprovante pelo WhatsApp e te mantemos informado sobre o impacto da sua contribuição.</p>
+        <div class="donate-steps">
+          <div class="d-step">
+            <div class="d-step__num">1</div>
+            <div>
+              <div class="d-step__title">Copie a chave PIX</div>
+              <div class="d-step__desc">Clique no botão acima para copiar a chave automaticamente.</div>
+            </div>
+          </div>
+          <div class="d-step">
+            <div class="d-step__num">2</div>
+            <div>
+              <div class="d-step__title">Faça o PIX no seu banco</div>
+              <div class="d-step__desc">Abra seu aplicativo bancário, escolha PIX por e-mail e cole a chave.</div>
+            </div>
+          </div>
+          <div class="d-step">
+            <div class="d-step__num">3</div>
+            <div>
+              <div class="d-step__title">Envie o comprovante</div>
+              <div class="d-step__desc">Mande o comprovante pelo WhatsApp. Te confirmamos o recebimento e informamos o impacto gerado.</div>
+            </div>
+          </div>
+        </div>
+        <a href="#" class="btn btn-green" style="margin-top:28px;width:fit-content" id="whatsappBtn">
+          💬 Enviar comprovante no WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!-- GALLERY                               -->
+<!-- ══════════════════════════════════════ -->
+<section class="section" id="galeria">
+  <div class="container">
+    <div class="center reveal" style="margin-bottom:40px">
+      <div class="label">Galeria</div>
+      <h2 class="h2" style="margin-bottom:12px">Nossa atuação em imagens</h2>
+      <p class="lead">Registros reais das ações da ONG da Paz em campo.</p>
+    </div>
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="gallery-item reveal" onclick="openLightbox(0)">
+        <div class="gallery-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Foto 1 — Terremoto Venezuela
+        </div>
+        <div class="gallery-overlay"><span>🔍 Ver foto</span></div>
+      </div>
+      <div class="gallery-item reveal reveal-delay-1" onclick="openLightbox(1)">
+        <div class="gallery-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Foto 2 — Famílias desabrigadas
+        </div>
+        <div class="gallery-overlay"><span>🔍 Ver foto</span></div>
+      </div>
+      <div class="gallery-item reveal reveal-delay-2" onclick="openLightbox(2)">
+        <div class="gallery-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Foto 3 — Distribuição de ajuda
+        </div>
+        <div class="gallery-overlay"><span>🔍 Ver foto</span></div>
+      </div>
+      <div class="gallery-item reveal reveal-delay-1" onclick="openLightbox(3)">
+        <div class="gallery-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Foto 4 — Crianças atendidas
+        </div>
+        <div class="gallery-overlay"><span>🔍 Ver foto</span></div>
+      </div>
+      <div class="gallery-item reveal reveal-delay-2" onclick="openLightbox(4)">
+        <div class="gallery-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Foto 5 — Voluntários em campo
+        </div>
+        <div class="gallery-overlay"><span>🔍 Ver foto</span></div>
+      </div>
+      <div class="gallery-item reveal reveal-delay-3" onclick="openLightbox(5)">
+        <div class="gallery-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Foto 6 — Entrega de suprimentos
+        </div>
+        <div class="gallery-overlay"><span>🔍 Ver foto</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Visualizador de imagens">
+  <button class="lightbox__close" onclick="closeLightbox()" aria-label="Fechar">✕</button>
+  <button class="lightbox__nav lightbox__prev" onclick="prevPhoto()" aria-label="Foto anterior">‹</button>
+  <img class="lightbox__img" id="lightboxImg" src="" alt="Foto da galeria"/>
+  <button class="lightbox__nav lightbox__next" onclick="nextPhoto()" aria-label="Próxima foto">›</button>
+  <div class="lightbox__caption" id="lightboxCaption"></div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- TESTIMONIALS                          -->
+<!-- ══════════════════════════════════════ -->
+<section class="section section--gray">
+  <div class="container">
+    <div class="center reveal" style="margin-bottom:48px">
+      <div class="label">Depoimentos</div>
+      <h2 class="h2" style="margin-bottom:12px">Quem já doou e<br>faz a diferença</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Doei R$100 e em menos de 24 horas recebi fotos de como minha contribuição foi usada. Transparência de verdade. Vou continuar apoiando."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">M</div>
+          <div>
+            <div class="testimonial-name">Marcos Oliveira</div>
+            <div class="testimonial-role">Apoiador desde 2024 · São Paulo</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"A ONG da Paz é diferente. Eles realmente mostram para onde vai o dinheiro. Recomendo para qualquer pessoa que queira ajudar de verdade."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">A</div>
+          <div>
+            <div class="testimonial-name">Ana Carolina Lima</div>
+            <div class="testimonial-role">Voluntária · Belo Horizonte</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Fiz a doação pelo PIX em 2 minutos. Simples, rápido e seguro. Recebi o comprovante de entrega no mesmo dia. Parabéns ao time."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">R</div>
+          <div>
+            <div class="testimonial-name">Rafael Mendes</div>
+            <div class="testimonial-role">Doador recorrente · Rio de Janeiro</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!-- FAQ                                   -->
+<!-- ══════════════════════════════════════ -->
+<section class="section" id="faq">
+  <div class="container" style="max-width:740px">
+    <div class="center reveal" style="margin-bottom:48px">
+      <div class="label">Perguntas Frequentes</div>
+      <h2 class="h2" style="margin-bottom:12px">Sua dúvida<br>tem resposta aqui</h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-trigger" onclick="toggleFaq(this)">
+          <span class="faq-question">Como sei que minha doação chegou até as vítimas?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-answer"><p>Após receber sua doação, enviamos um comprovante de recebimento pelo WhatsApp. Em até 72 horas, publicamos fotos e relatórios mostrando como os recursos foram utilizados. Você acompanha o impacto real da sua contribuição.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-trigger" onclick="toggleFaq(this)">
+          <span class="faq-question">Como a ONG utiliza os recursos arrecadados?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-answer"><p>100% das doações recebidas são convertidas e enviadas às famílias venezuelanas. Os custos operacionais da ONG são custeados separadamente, garantindo que cada centavo do doador chegue ao destino final.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-trigger" onclick="toggleFaq(this)">
+          <span class="faq-question">Posso doar qualquer valor?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-answer"><p>Sim! Qualquer valor é bem-vindo. R$10, R$20 ou R$500 — toda contribuição faz diferença. Os botões de valor rápido são apenas sugestões para facilitar. Você pode transferir o valor que quiser pelo PIX.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-trigger" onclick="toggleFaq(this)">
+          <span class="faq-question">Recebo algum comprovante da doação?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-answer"><p>Sim. Envie o comprovante de transferência pelo WhatsApp e nossa equipe confirmará o recebimento em até 1 hora. Você receberá também relatórios sobre o uso da sua doação.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-trigger" onclick="toggleFaq(this)">
+          <span class="faq-question">A ONG da Paz é uma organização legítima?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-answer"><p>Sim. Somos uma organização humanitária brasileira com CNPJ ativo, atuando de forma transparente e verificável. Todos os nossos relatórios, parceiros e documentos estão disponíveis para consulta. Em caso de dúvida, entre em contato diretamente conosco.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!-- FINAL CTA                             -->
+<!-- ══════════════════════════════════════ -->
+<section class="cta-final">
+  <div class="container">
+    <div class="reveal">
+      <div class="label label--white center" style="margin-bottom:16px">Não espere para ajudar</div>
+      <h2 class="h2" style="color:white;text-align:center;margin-bottom:16px">Cada minuto conta.<br>Doe agora.</h2>
+      <p style="font-size:18px;color:rgba(255,255,255,.8);text-align:center;line-height:1.7;margin-bottom:40px;max-width:520px;margin-left:auto;margin-right:auto">As famílias venezuelanas precisam da nossa solidariedade agora. Faça sua parte — qualquer valor, qualquer hora.</p>
+      <div class="cta-final__btns">
+        <a href="#doar" class="btn btn-gold btn-lg">💛 QUERO DOAR AGORA</a>
+        <a href="#faq" class="btn btn-outline btn-lg">Tenho uma dúvida</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<!-- FOOTER                                -->
+<!-- ══════════════════════════════════════ -->
+<footer class="footer" id="contato">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div class="nav__logo" style="margin-bottom:4px">
+          <svg class="logo-sm" viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="30" fill="#1B5E8C"/><ellipse cx="33" cy="26" rx="9.5" ry="6.5" fill="white" transform="rotate(-15 33 26)"/><circle cx="41" cy="21" r="4.5" fill="white"/><path d="M45 20.5 L50 21.5 L45 22.5z" fill="#F59E0B"/><path d="M24 29.5 L17 35 L20 27z" fill="white" opacity=".9"/><path d="M18 40 Q27 33 40 38" stroke="#4CAF50" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="25" cy="36" rx="3" ry="1.8" fill="#4CAF50" transform="rotate(-20 25 36)"/><ellipse cx="31" cy="34" rx="3" ry="1.8" fill="#4CAF50"/><ellipse cx="37" cy="36" rx="3" ry="1.8" fill="#4CAF50" transform="rotate(15 37 36)"/></svg>
+          <div class="nav__logo-text footer__logo-text"><strong>ONG da Paz</strong><span>Solidariedade Brasil</span></div>
+        </div>
+        <p>Organização humanitária brasileira conectando doadores a comunidades em vulnerabilidade. Transparência e responsabilidade em cada ação.</p>
+        <div class="footer__socials">
+          <a href="#" class="social-link" aria-label="Instagram">𝑖𝑔</a>
+          <a href="#" class="social-link" aria-label="Facebook">𝑓</a>
+          <a href="#" class="social-link" aria-label="WhatsApp">💬</a>
+          <a href="#" class="social-link" aria-label="Email">✉</a>
+        </div>
+      </div>
+
+      <div class="footer__col">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="#sobre">Sobre nós</a></li>
+          <li><a href="#missao">Nossa missão</a></li>
+          <li><a href="#transparencia">Transparência</a></li>
+          <li><a href="#galeria">Galeria</a></li>
+          <li><a href="#faq">Perguntas frequentes</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h4>Como ajudar</h4>
+        <ul>
+          <li><a href="#doar">Fazer uma doação</a></li>
+          <li><a href="#contato">Ser voluntário</a></li>
+          <li><a href="#contato">Parceria institucional</a></li>
+          <li><a href="#contato">Divulgar a campanha</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h4>Contato</h4>
+        <ul>
+          <li><a href="#">📍 [Endereço da ONG]</a></li>
+          <li><a href="#">📞 [Telefone]</a></li>
+          <li><a href="#">💬 WhatsApp</a></li>
+          <li><a href="#">📧 [E-mail]</a></li>
+          <li><a href="#">CNPJ: XX.XXX.XXX/XXXX-XX</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p class="footer__copy">© 2025 ONG da Paz — Todos os direitos reservados</p>
+      <div class="footer__legal">
+        <a href="#">Política de Privacidade</a>
+        <a href="#">Termos de Uso</a>
+        <a href="#">Relatórios</a>
+      </div>
+    </div>
+  </div>
 </footer>
 
-<!-- FLOAT DONATE BUTTON -->
-<a href="#doar" class="float-donate">💛 Doe Agora</a>
+<!-- Floating Button -->
+<a href="#doar" class="float-btn" aria-label="Fazer doação">💛 DOAR AGORA</a>
 
+<!-- ══════════════════════════════════════ -->
+<!-- JAVASCRIPT                            -->
+<!-- ══════════════════════════════════════ -->
 <script>
-  function selectAmount(btn) {
-    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+/* ─── CONFIG — edite aqui ─────────────────────────────────────── */
+const CONFIG = {
+  pix: {
+    key: "lojablackacd@jim.com",
+    banco: "PIX E-mail",
+    titular: "ONG da Paz"
+  },
+  campaign: {
+    goal: 50000,
+    raised: 12750,
+    daysLeft: 14
+  },
+  ong: {
+    cnpj: "XX.XXX.XXX/XXXX-XX",
+    whatsapp: "5511900000000",
+    phone: "[Telefone]",
+    address: "[Endereço]",
+    instagram: "#",
+    facebook: "#",
+    email: "[email@ongdapaz.org]"
+  },
+  impact: [
+    { target: 1240, suffix: "+", label: "Famílias atendidas" },
+    { target: 85,   suffix: "",  label: "Voluntários" },
+    { target: 32,   suffix: "",  label: "Projetos realizados" },
+    { target: 8,    suffix: "",  label: "Regiões atendidas" }
+  ],
+  testimonials: [
+    { text: "Doei R$100 e em menos de 24 horas recebi fotos de como minha contribuição foi usada. Transparência de verdade. Vou continuar apoiando.", name: "Marcos Oliveira", role: "Apoiador desde 2024 · São Paulo", initial: "M" },
+    { text: "A ONG da Paz é diferente. Eles realmente mostram para onde vai o dinheiro. Recomendo para qualquer pessoa que queira ajudar de verdade.", name: "Ana Carolina Lima", role: "Voluntária · Belo Horizonte", initial: "A" },
+    { text: "Fiz a doação pelo PIX em 2 minutos. Simples, rápido e seguro. Recebi o comprovante de entrega no mesmo dia. Parabéns ao time.", name: "Rafael Mendes", role: "Doador recorrente · Rio de Janeiro", initial: "R" }
+  ],
+  gallery: [
+    { src: "", caption: "Terremoto — Venezuela 2025" },
+    { src: "", caption: "Famílias desabrigadas" },
+    { src: "", caption: "Distribuição de ajuda" },
+    { src: "", caption: "Crianças atendidas" },
+    { src: "", caption: "Voluntários em campo" },
+    { src: "", caption: "Entrega de suprimentos" }
+  ],
+  faq: [
+    { q: "Como sei que minha doação chegou até as vítimas?", a: "Após receber sua doação, enviamos um comprovante de recebimento pelo WhatsApp. Em até 72 horas, publicamos fotos e relatórios mostrando como os recursos foram utilizados." },
+    { q: "Como a ONG utiliza os recursos arrecadados?", a: "100% das doações recebidas são convertidas e enviadas às famílias venezuelanas. Os custos operacionais da ONG são custeados separadamente." },
+    { q: "Posso doar qualquer valor?", a: "Sim! Qualquer valor é bem-vindo. Os botões de valor rápido são apenas sugestões para facilitar." },
+    { q: "Recebo algum comprovante da doação?", a: "Sim. Envie o comprovante de transferência pelo WhatsApp e nossa equipe confirmará o recebimento em até 1 hora." },
+    { q: "A ONG da Paz é uma organização legítima?", a: "Sim. Somos uma organização humanitária brasileira com CNPJ ativo, atuando de forma transparente e verificável." }
+  ]
+};
 
-  function copyPix() {
-    const key = document.getElementById('pix-key-display').textContent.trim();
-    if (key.includes('INSERIR')) {
-      alert('⚠️ Chave PIX ainda não configurada. Aguarde a atualização!');
-      return;
-    }
-    navigator.clipboard.writeText(key).then(() => {
-      const btn = document.querySelector('.donate-box__copy-btn');
-      const original = btn.textContent;
-      btn.textContent = '✅ Chave copiada! Abra seu banco agora';
-      btn.style.background = '#22944A';
-      setTimeout(() => {
-        btn.textContent = original;
-        btn.style.background = '';
-      }, 3000);
+/* ─── INIT ────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  initProgress();
+  initWhatsApp();
+  initReveal();
+  initCounters();
+});
+
+/* ─── PROGRESS BAR ─────────────────────────────────────────────  */
+function initProgress() {
+  const { goal, raised, daysLeft } = CONFIG.campaign;
+  const pct = Math.min(Math.round((raised / goal) * 100), 100);
+  const fmt = n => 'R$' + n.toLocaleString('pt-BR');
+
+  document.getElementById('progressVal').textContent  = fmt(raised);
+  document.getElementById('progressGoal').textContent = fmt(goal);
+  document.getElementById('progressPct').textContent  = pct + '% alcançado';
+  document.getElementById('progressDays').textContent = daysLeft + ' dias restantes';
+
+  setTimeout(() => {
+    document.getElementById('progressFill').style.width = pct + '%';
+  }, 400);
+}
+
+/* ─── WHATSAPP ──────────────────────────────────────────────────  */
+function initWhatsApp() {
+  const num = CONFIG.ong.whatsapp;
+  const msg = encodeURIComponent('Olá! Fiz uma doação para a ONG da Paz e quero enviar o comprovante. 💛');
+  document.getElementById('whatsappBtn').href = `https://wa.me/${num}?text=${msg}`;
+}
+
+/* ─── MOBILE MENU ───────────────────────────────────────────────  */
+const hamburger   = document.getElementById('hamburger');
+const mobileMenu  = document.getElementById('mobileMenu');
+const menuClose   = document.getElementById('menuClose');
+
+hamburger.addEventListener('click', () => {
+  mobileMenu.classList.add('open');
+  hamburger.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+});
+
+function closeMobile() {
+  mobileMenu.classList.remove('open');
+  hamburger.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+}
+menuClose.addEventListener('click', closeMobile);
+
+/* ─── AMOUNT SELECTION ──────────────────────────────────────────  */
+function selectAmount(btn, val, tag) {
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function openCustom(btn) {
+  selectAmount(btn, 'Outro', 'Valor livre');
+  const v = prompt('Digite o valor da doação (ex: 75):');
+  if (v && !isNaN(v) && Number(v) > 0) {
+    btn.querySelector('.amount-val').textContent = 'R$' + Number(v).toLocaleString('pt-BR');
+    btn.querySelector('.amount-tag').textContent = 'Valor escolhido';
+  }
+}
+
+/* ─── COPY PIX ──────────────────────────────────────────────────  */
+function copyPix() {
+  const key = CONFIG.pix.key;
+  const btn = document.getElementById('copyBtn');
+
+  navigator.clipboard.writeText(key).then(() => {
+    btn.textContent = '✅ CHAVE COPIADA! Abra seu banco agora';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> COPIAR CHAVE PIX';
+      btn.classList.remove('copied');
+    }, 4000);
+  }).catch(() => {
+    btn.textContent = '⚠️ Copie manualmente: ' + key;
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> COPIAR CHAVE PIX';
+    }, 5000);
+  });
+}
+
+/* ─── SCROLL REVEAL ─────────────────────────────────────────────  */
+function initReveal() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}
+
+/* ─── COUNTER ANIMATION ─────────────────────────────────────────  */
+function initCounters() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el     = e.target;
+      const target = parseInt(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      const dur    = 1800;
+      const step   = 16;
+      const inc    = target / (dur / step);
+      let current  = 0;
+
+      const timer = setInterval(() => {
+        current = Math.min(current + inc, target);
+        el.textContent = Math.floor(current).toLocaleString('pt-BR') + suffix;
+        if (current >= target) clearInterval(timer);
+      }, step);
+
+      obs.unobserve(el);
     });
-  }
-</script>
+  }, { threshold: 0.5 });
 
+  document.querySelectorAll('.counter').forEach(el => obs.observe(el));
+}
+
+/* ─── FAQ ACCORDION ─────────────────────────────────────────────  */
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+/* ─── GALLERY LIGHTBOX ──────────────────────────────────────────  */
+let currentPhoto = 0;
+const photos = CONFIG.gallery;
+
+function openLightbox(idx) {
+  currentPhoto = idx;
+  showPhoto();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function prevPhoto() { currentPhoto = (currentPhoto - 1 + photos.length) % photos.length; showPhoto(); }
+function nextPhoto() { currentPhoto = (currentPhoto + 1) % photos.length; showPhoto(); }
+function showPhoto() {
+  const p = photos[currentPhoto];
+  const img = document.getElementById('lightboxImg');
+  document.getElementById('lightboxCaption').textContent = p.caption || '';
+  if (p.src) {
+    img.src = p.src;
+    img.style.display = 'block';
+  } else {
+    img.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect width="600" height="400" fill="#1a2a3a"/><text x="300" y="180" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-size="48" font-family="Arial">📷</text><text x="300" y="230" fill="rgba(255,255,255,0.4)" text-anchor="middle" font-size="18" font-family="Arial">' + (p.caption||'Foto '+(currentPhoto+1)) + '</text><text x="300" y="260" fill="rgba(255,255,255,0.2)" text-anchor="middle" font-size="13" font-family="Arial">Aguardando imagem</text></svg>');
+    img.style.display = 'block';
+  }
+}
+
+document.getElementById('lightbox').addEventListener('click', function(e) {
+  if (e.target === this) closeLightbox();
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') prevPhoto();
+  if (e.key === 'ArrowRight') nextPhoto();
+});
+
+/* ─── FLOAT BUTTON HIDE ON FOOTER ──────────────────────────────  */
+const floatBtn = document.querySelector('.float-btn');
+const footer   = document.querySelector('.footer');
+const obs2 = new IntersectionObserver(([e]) => {
+  floatBtn.style.opacity = e.isIntersecting ? '0' : '1';
+  floatBtn.style.pointerEvents = e.isIntersecting ? 'none' : 'auto';
+});
+obs2.observe(footer);
+</script>
 </body>
 </html>
