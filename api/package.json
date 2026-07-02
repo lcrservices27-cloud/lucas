@@ -1,0 +1,21 @@
+{
+  "name": "clinica-sorria-mais-api",
+  "version": "1.0.0",
+  "description": "Agente de atendimento via WhatsApp para Clínica Sorria Mais",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "migrate": "node migrations/run.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "pg": "^8.13.0"
+  }
+}
