@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:init": "node --env-file=.env.local scripts/init-db.mjs",
+    "prospects": "node --env-file=.env.local scripts/cli.mjs",
+    "import:prospects": "node --env-file=.env.local scripts/import-prospects.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "next": "16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4"

@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pipeline — Lucas AI
 
-## Getting Started
+Dashboard interno de prospecção da Lucas AI. Substitui o rastreamento manual em `comercial/pipeline.md` por um CRM simples: lista filtrável de imobiliárias-alvo (Hot/Warm/Cold/Skip), edição de status/dados e log de atividades (ligações, WhatsApp, calls).
 
-First, run the development server:
+Uso interno apenas — não é o painel que os clientes (imobiliárias) usariam.
+
+## Stack
+
+- Next.js (App Router), JavaScript
+- Postgres via `@neondatabase/serverless` (Vercel Postgres / Neon), SQL parametrizado, sem ORM
+- Auth própria mínima: cookie assinado (HMAC), usuário único
+
+## Rodando localmente
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+vercel link                      # conecta este diretório ao projeto na Vercel
+vercel env pull .env.local       # baixa DATABASE_URL do storage Postgres do projeto
+# preencher ADMIN_EMAIL / ADMIN_PASSWORD / SESSION_SECRET em .env.local (ver .env.local.example)
+
+npm run db:init                  # cria as tabelas prospects e prospect_activities
+npm run import:prospects         # importa os alvos reais de comercial/alvos-25-reclassificados.md
+npm run dev                      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- `npm run dev` / `build` / `start` — Next.js
+- `npm run db:init` — cria/verifica o schema (idempotente)
+- `npm run prospects [hot|warm|cold|skip]` — lista prospects via terminal, sem passar pela API/auth
+- `npm run import:prospects` — importação única dos dados reais (idempotente, não duplica por telefone)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estrutura
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/api/prospects/*` — CRUD de prospects + log de atividades
+- `app/api/auth/*` — login/logout/sessão
+- `app/dashboard`, `app/login` — UI
+- `lib/` — db, auth, validação, constantes (fonte única dos enums de status/score)
+- `scripts/` — CLI local e importação de dados
