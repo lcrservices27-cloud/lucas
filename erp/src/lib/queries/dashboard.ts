@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { startOfMonth, startOfYear, subMonths, format, differenceInCalendarDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { sincronizarAtrasos } from "@/lib/financeiro-sync";
 import type { StatusComercial } from "@/generated/prisma/enums";
 
 export async function getDashboardData() {
+  await sincronizarAtrasos();
+
   const now = new Date();
   const inicioMes = startOfMonth(now);
   const inicioAno = startOfYear(now);

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, assertUser } from "@/lib/auth";
 
 export type EventoState = { error?: string };
 
@@ -38,6 +38,7 @@ export async function createEvento(_prevState: EventoState, formData: FormData):
 }
 
 export async function toggleEventoConcluido(id: string, concluido: boolean) {
+  await assertUser();
   await prisma.evento.update({ where: { id }, data: { concluido } });
   revalidatePath("/agenda");
 }

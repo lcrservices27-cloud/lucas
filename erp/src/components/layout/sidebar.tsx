@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/lib/nav";
 
-export function Sidebar({ className }: { className?: string }) {
+export function Sidebar({ className, isAdmin = true }: { className?: string; isAdmin?: boolean }) {
   const pathname = usePathname();
+  const items = isAdmin ? NAV_ITEMS : NAV_ITEMS.filter((i) => i.href !== "/usuarios");
 
   return (
     <nav className={cn("flex h-full w-64 flex-col gap-1 border-r bg-sidebar p-3 text-sidebar-foreground", className)}>
@@ -21,7 +22,7 @@ export function Sidebar({ className }: { className?: string }) {
       </div>
 
       <div className="mt-2 flex flex-1 flex-col gap-0.5 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
           return (

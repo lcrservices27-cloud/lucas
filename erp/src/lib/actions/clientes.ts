@@ -3,9 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, assertUser } from "@/lib/auth";
 import { clienteSchema } from "@/lib/validators/cliente";
 import { logTimeline } from "@/lib/actions/timeline";
+import {
+  STATUS_COMERCIAL_ORDER,
+  STATUS_COMERCIAL_LABEL,
+  STATUS_JURIDICO_ORDER,
+  STATUS_JURIDICO_LABEL,
+} from "@/lib/labels";
+import type { StatusComercial, StatusJuridico } from "@/generated/prisma/enums";
 
 export type FormState = {
   error?: string;
@@ -92,16 +99,19 @@ export async function updateCliente(clienteId: string, _prevState: FormState, fo
 }
 
 export async function updateStatusComercial(clienteId: string, statusComercial: string) {
-  const usuario = await getCurrentUser();
+  const usuario = await assertUser();
+  if (!STATUS_COMERCIAL_ORDER.includes(statusComercial)) {
+    throw new Error(`Status comercial inválido: ${statusComercial}`);
+  }
   const cliente = await prisma.cliente.update({
     where: { id: clienteId },
-    data: { statusComercial: statusComercial as never },
+    data: { statusComercial: statusComercial as StatusComercial },
   });
   await logTimeline(
     clienteId,
     "STATUS_ALTERADO",
-    `Status comercial alterado para "${statusComercial}"`,
-    usuario?.id
+    `Status comercial alterado para "${STATUS_COMERCIAL_LABEL[statusComercial]}"`,
+    usuario.id
   );
   revalidatePath("/comercial");
   revalidatePath(`/crm/${clienteId}`);
@@ -109,16 +119,19 @@ export async function updateStatusComercial(clienteId: string, statusComercial: 
 }
 
 export async function updateStatusJuridico(clienteId: string, statusJuridico: string) {
-  const usuario = await getCurrentUser();
+  const usuario = await assertUser();
+  if (!STATUS_JURIDICO_ORDER.includes(statusJuridico)) {
+    throw new Error(`Status jurídico inválido: ${statusJuridico}`);
+  }
   const cliente = await prisma.cliente.update({
     where: { id: clienteId },
-    data: { statusJuridico: statusJuridico as never },
+    data: { statusJuridico: statusJuridico as StatusJuridico },
   });
   await logTimeline(
     clienteId,
     "STATUS_ALTERADO",
-    `Status jurídico alterado para "${statusJuridico}"`,
-    usuario?.id
+    `Status jurídico alterado para "${STATUS_JURIDICO_LABEL[statusJuridico]}"`,
+    usuario.id
   );
   revalidatePath("/juridico");
   revalidatePath(`/crm/${clienteId}`);

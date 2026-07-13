@@ -5,10 +5,11 @@ import { VoiceAssistant } from "@/components/assistant/voice-assistant";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const usuario = await requireUser();
+  const isAdmin = usuario.papel === "ADMINISTRADOR";
 
   return (
     <div className="flex h-screen overflow-hidden bg-muted/20">
-      <Sidebar className="hidden md:flex" />
+      <Sidebar className="hidden md:flex" isAdmin={isAdmin} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
           user={{
@@ -16,6 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             email: usuario.email,
             papel: PAPEL_LABEL[usuario.papel] ?? usuario.papel,
             avatarUrl: usuario.avatarUrl,
+            isAdmin,
           }}
         />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>

@@ -49,7 +49,7 @@ export function VoiceAssistant() {
   const [configurado, setConfigurado] = React.useState<boolean | null>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  const { falar } = useSpeechSynthesis();
+  const { falar, parar } = useSpeechSynthesis();
 
   React.useEffect(() => {
     fetch("/api/assistente/status")
@@ -167,7 +167,10 @@ export function VoiceAssistant() {
         open={open}
         onOpenChange={(v) => {
           setOpen(v);
-          if (!v) stop();
+          if (!v) {
+            stop();
+            parar();
+          }
         }}
       >
         <SheetContent side="right" className="flex w-full flex-col sm:max-w-md">

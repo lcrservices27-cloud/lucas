@@ -3,6 +3,7 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { readSession } from "@/lib/session";
+import { PAPEL_USUARIO_LABEL } from "@/lib/labels";
 
 export const getCurrentUser = cache(async () => {
   const session = await readSession();
@@ -15,6 +16,7 @@ export const getCurrentUser = cache(async () => {
   return usuario;
 });
 
+// Para Server Components/páginas: sem sessão, redireciona para o login.
 export async function requireUser() {
   const usuario = await getCurrentUser();
   if (!usuario) {
@@ -23,10 +25,21 @@ export async function requireUser() {
   return usuario;
 }
 
-export const PAPEL_LABEL: Record<string, string> = {
-  ADMINISTRADOR: "Administrador",
-  FINANCEIRO: "Financeiro",
-  ATENDIMENTO: "Atendimento",
-  CONSULTOR: "Consultor",
-  JURIDICO: "Jurídico",
-};
+// Para Server Actions e route handlers de mutação: sem sessão, aborta.
+export async function assertUser() {
+  const usuario = await getCurrentUser();
+  if (!usuario) {
+    throw new Error("Não autenticado.");
+  }
+  return usuario;
+}
+
+export async function assertAdmin() {
+  const usuario = await assertUser();
+  if (usuario.papel !== "ADMINISTRADOR") {
+    throw new Error("Apenas administradores podem executar esta ação.");
+  }
+  return usuario;
+}
+
+export const PAPEL_LABEL = PAPEL_USUARIO_LABEL;

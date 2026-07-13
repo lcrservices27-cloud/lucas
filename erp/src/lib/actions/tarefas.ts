@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, assertUser } from "@/lib/auth";
 import { logTimeline } from "@/lib/actions/timeline";
 
 export type TarefaState = { error?: string };
@@ -41,14 +41,14 @@ export async function createTarefa(_prevState: TarefaState, formData: FormData):
 }
 
 export async function toggleTarefaConcluida(id: string, concluida: boolean) {
-  const usuario = await getCurrentUser();
+  const usuario = await assertUser();
   const tarefa = await prisma.tarefa.update({
     where: { id },
     data: { concluida, concluidaEm: concluida ? new Date() : null },
   });
 
   if (tarefa.clienteId && concluida) {
-    await logTimeline(tarefa.clienteId, "TAREFA_CONCLUIDA", `Tarefa concluída: ${tarefa.titulo}`, usuario?.id);
+    await logTimeline(tarefa.clienteId, "TAREFA_CONCLUIDA", `Tarefa concluída: ${tarefa.titulo}`, usuario.id);
   }
 
   revalidatePath("/tarefas");

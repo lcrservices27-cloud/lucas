@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getUsuarios } from "@/lib/queries/usuarios";
 import { requireUser } from "@/lib/auth";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +7,11 @@ import { NovoUsuarioDialog } from "@/components/usuarios/novo-usuario-dialog";
 import { UsuarioRow } from "@/components/usuarios/usuario-row";
 
 export default async function UsuariosPage() {
-  const [usuarios, atual] = await Promise.all([getUsuarios(), requireUser()]);
+  const atual = await requireUser();
+  if (atual.papel !== "ADMINISTRADOR") {
+    redirect("/dashboard");
+  }
+  const usuarios = await getUsuarios();
 
   return (
     <div className="space-y-4">

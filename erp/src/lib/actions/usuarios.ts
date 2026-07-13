@@ -3,20 +3,31 @@
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { assertAdmin } from "@/lib/auth";
+import { PAPEL_USUARIO_LABEL } from "@/lib/labels";
+import type { PapelUsuario } from "@/generated/prisma/enums";
 
 export type UsuarioState = { error?: string };
 
+const PAPEIS_VALIDOS = new Set(Object.keys(PAPEL_USUARIO_LABEL));
+
+function papelValido(papel: string): PapelUsuario {
+  return (PAPEIS_VALIDOS.has(papel) ? papel : "ATENDIMENTO") as PapelUsuario;
+}
+
 export async function createUsuario(_prevState: UsuarioState, formData: FormData): Promise<UsuarioState> {
-  const atual = await requireUser();
-  if (atual.papel !== "ADMINISTRADOR") return { error: "Apenas administradores podem criar usuários." };
+  try {
+    await assertAdmin();
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Sem permissão." };
+  }
 
   const nome = String(formData.get("nome") ?? "").trim();
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
   const senha = String(formData.get("senha") ?? "");
-  const papel = String(formData.get("papel") ?? "ATENDIMENTO");
+  const papel = papelValido(String(formData.get("papel") ?? "ATENDIMENTO"));
 
   if (!nome || !email || senha.length < 6) {
     return { error: "Preencha nome, e-mail e uma senha com pelo menos 6 caracteres." };
@@ -27,7 +38,7 @@ export async function createUsuario(_prevState: UsuarioState, formData: FormData
 
   const senhaHash = await bcrypt.hash(senha, 10);
   await prisma.usuario.create({
-    data: { nome, email, senhaHash, papel: papel as never },
+    data: { nome, email, senhaHash, papel },
   });
 
   revalidatePath("/usuarios");
@@ -35,8 +46,7 @@ export async function createUsuario(_prevState: UsuarioState, formData: FormData
 }
 
 export async function toggleUsuarioAtivo(id: string, ativo: boolean) {
-  const atual = await requireUser();
-  if (atual.papel !== "ADMINISTRADOR") throw new Error("Apenas administradores podem alterar usuários.");
+  const atual = await assertAdmin();
   if (atual.id === id && !ativo) throw new Error("Você não pode desativar sua própria conta.");
 
   await prisma.usuario.update({ where: { id }, data: { ativo } });
@@ -44,9 +54,10 @@ export async function toggleUsuarioAtivo(id: string, ativo: boolean) {
 }
 
 export async function updateUsuarioPapel(id: string, papel: string) {
-  const atual = await requireUser();
-  if (atual.papel !== "ADMINISTRADOR") throw new Error("Apenas administradores podem alterar usuários.");
+  const atual = await assertAdmin();
+  if (atual.id === id) throw new Error("Você não pode alterar seu próprio papel.");
+  if (!PAPEIS_VALIDOS.has(papel)) throw new Error("Papel inválido.");
 
-  await prisma.usuario.update({ where: { id }, data: { papel: papel as never } });
+  await prisma.usuario.update({ where: { id }, data: { papel: papel as PapelUsuario } });
   revalidatePath("/usuarios");
 }

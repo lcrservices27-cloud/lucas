@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { startOfMonth, startOfYear } from "date-fns";
+import { sincronizarAtrasos } from "@/lib/financeiro-sync";
 
 export async function getFinanceiroData() {
+  await sincronizarAtrasos();
+
   const now = new Date();
   const inicioMes = startOfMonth(now);
   const inicioAno = startOfYear(now);

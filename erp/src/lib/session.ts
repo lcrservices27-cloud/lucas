@@ -3,6 +3,11 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 const SESSION_COOKIE = "lucas_session";
+
+if (!process.env.AUTH_SECRET && process.env.NODE_ENV === "production") {
+  throw new Error("AUTH_SECRET é obrigatório em produção. Defina a variável de ambiente.");
+}
+
 const secret = new TextEncoder().encode(
   process.env.AUTH_SECRET ?? "dev-only-insecure-secret-change-me"
 );

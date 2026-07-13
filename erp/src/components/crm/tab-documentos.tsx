@@ -55,7 +55,7 @@ export function TabDocumentos({ cliente }: { cliente: ClienteDetail }) {
                     <span>· {formatDateTime(doc.criadoEm)}</span>
                   </div>
                 </div>
-                <a href={doc.url} download target="_blank" rel="noopener noreferrer">
+                <a href={`/api/documentos/${doc.id}`} target="_blank" rel="noopener noreferrer">
                   <Button variant="ghost" size="icon" className="size-8">
                     <Download className="size-4" />
                   </Button>

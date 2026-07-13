@@ -43,6 +43,6 @@ next-env.d.ts
 
 /src/generated/prisma
 
-# uploaded files (local disk storage)
-/public/uploads/*
-!/public/uploads/.gitkeep
+# uploaded files (local disk storage, served via /api/documentos/[id])
+/uploads/*
+!/uploads/.gitkeep

@@ -215,7 +215,9 @@ async function main() {
             clienteId: cliente.id,
             tipo,
             nomeArquivo: `${tipo.toLowerCase()}-${cliente.id.slice(0, 6)}.pdf`,
-            url: `/uploads/placeholder-${tipo.toLowerCase()}.pdf`,
+            // Chave de storage relativa (arquivo não existe de fato no seed;
+            // o download responde 404 de forma limpa).
+            url: `${cliente.id}/seed-${tipo.toLowerCase()}.pdf`,
             tamanho: faker.number.int({ min: 50_000, max: 2_000_000 }),
             enviadoPorId: pick(usuarios).id,
           },

@@ -27,6 +27,7 @@ type TopbarUser = {
   email: string;
   papel: string;
   avatarUrl: string | null;
+  isAdmin: boolean;
 };
 
 export function Topbar({ user }: { user: TopbarUser }) {
@@ -45,7 +46,7 @@ export function Topbar({ user }: { user: TopbarUser }) {
           <VisuallyHidden>
             <SheetTitle>Menu</SheetTitle>
           </VisuallyHidden>
-          <Sidebar className="w-full border-r-0" />
+          <Sidebar className="w-full border-r-0" isAdmin={user.isAdmin} />
         </SheetContent>
       </Sheet>
 
@@ -82,11 +83,13 @@ export function Topbar({ user }: { user: TopbarUser }) {
               <Settings /> Configurações
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/usuarios">
-              <UserIcon /> Usuários
-            </Link>
-          </DropdownMenuItem>
+          {user.isAdmin && (
+            <DropdownMenuItem asChild>
+              <Link href="/usuarios">
+                <UserIcon /> Usuários
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"

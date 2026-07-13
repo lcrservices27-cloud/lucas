@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { assertUser } from "@/lib/auth";
 import { logTimeline } from "@/lib/actions/timeline";
 import { formatCurrency } from "@/lib/utils";
 import type { MetodoPagamento, TipoPagamento } from "@/generated/prisma/enums";
@@ -23,26 +23,35 @@ async function recalcularStatusFinanceiro(clienteId: string) {
     prisma.pagamento.findMany({ where: { clienteId } }),
   ]);
 
+  // Cancelamento é decisão manual — não deve ser revertido por um recálculo.
+  if (cliente.statusFinanceiro === "CANCELADO") return;
+
   const totalPago = pagamentos.reduce((acc, p) => acc + Number(p.valor), 0);
   const valorContratado = Number(cliente.valorContratado);
   const temAtrasada = parcelas.some((p) => p.status === "ATRASADA");
+  const soEntradaPaga =
+    pagamentos.length > 0 && pagamentos.every((p) => p.tipo === "ENTRADA");
 
   let status: "NAO_INICIADO" | "ENTRADA_PAGA" | "PAGAMENTO_PARCIAL" | "PAGO" | "ATRASADO" = "NAO_INICIADO";
   if (valorContratado > 0 && totalPago >= valorContratado) {
     status = "PAGO";
   } else if (temAtrasada) {
     status = "ATRASADO";
+  } else if (soEntradaPaga) {
+    status = "ENTRADA_PAGA";
   } else if (totalPago > 0) {
-    status = parcelas.length > 0 && parcelas.some((p) => p.numero === 1 && p.status === "PAGA") && totalPago < valorContratado
-      ? "PAGAMENTO_PARCIAL"
-      : "PAGAMENTO_PARCIAL";
+    status = "PAGAMENTO_PARCIAL";
   }
 
   await prisma.cliente.update({ where: { id: clienteId }, data: { statusFinanceiro: status } });
 }
 
 export async function registrarPagamento(input: RegistrarPagamentoInput) {
-  const usuario = await getCurrentUser();
+  const usuario = await assertUser();
+
+  if (!Number.isFinite(input.valor) || input.valor <= 0) {
+    throw new Error("Valor de pagamento inválido.");
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.pagamento.create({
@@ -53,7 +62,7 @@ export async function registrarPagamento(input: RegistrarPagamentoInput) {
         metodo: input.metodo,
         valor: input.valor,
         observacao: input.observacao || null,
-        registradoPorId: usuario?.id,
+        registradoPorId: usuario.id,
       },
     });
 
@@ -67,7 +76,7 @@ export async function registrarPagamento(input: RegistrarPagamentoInput) {
     input.clienteId,
     "PAGAMENTO_RECEBIDO",
     `Pagamento registrado — ${formatCurrency(input.valor)}`,
-    usuario?.id
+    usuario.id
   );
 
   revalidatePath(`/crm/${input.clienteId}`);
@@ -76,6 +85,7 @@ export async function registrarPagamento(input: RegistrarPagamentoInput) {
 }
 
 export async function marcarParcelaAtrasada(parcelaId: string, clienteId: string) {
+  await assertUser();
   await prisma.parcela.update({ where: { id: parcelaId }, data: { status: "ATRASADA" } });
   await recalcularStatusFinanceiro(clienteId);
   revalidatePath(`/crm/${clienteId}`);

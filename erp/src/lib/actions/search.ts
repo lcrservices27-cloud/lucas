@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { assertUser } from "@/lib/auth";
 
 export type SearchResult = {
   id: string;
@@ -11,6 +12,8 @@ export type SearchResult = {
 };
 
 export async function searchClientes(query: string): Promise<SearchResult[]> {
+  await assertUser();
+
   const q = query.trim();
   if (q.length < 2) return [];
 

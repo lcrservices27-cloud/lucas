@@ -51,9 +51,11 @@ Todos com a senha `lucas123`:
 - `src/components/ui/*` — primitivos shadcn/ui
 - `src/components/<modulo>/*` — componentes específicos de cada módulo
 
-Uploads de documentos são gravados em `public/uploads/<clienteId>/` (disco
-local — adequado para deploy self-hosted; trocar por um storage externo em
-produção multi-instância).
+Uploads de documentos são gravados em `uploads/<clienteId>/` (fora de
+`public/`, pois contêm dados sensíveis) e servidos exclusivamente pela rota
+autenticada `/api/documentos/[id]`. Uploads têm limite de 10 MB e allowlist
+de extensões. Adequado para deploy self-hosted; trocar por um storage
+externo em produção multi-instância.
 
 ## Assistente de voz com IA
 
@@ -104,8 +106,12 @@ configurado manualmente ao importar o projeto.
 6. (Opcional) Para popular com dados de exemplo, rode localmente uma vez
    apontando para o banco de produção: `DATABASE_URL="<url-da-vercel>" pnpm db:seed`.
 
-**Limitação conhecida:** o upload de documentos grava em disco local
-(`public/uploads`), que não persiste entre invocações serverless na Vercel.
-Os uploads funcionam durante a requisição mas o arquivo pode não estar
-disponível depois — para produção real na Vercel, trocar por um storage
-externo (Vercel Blob, S3, etc.).
+**Limitações conhecidas na Vercel:**
+
+- O upload de documentos grava em disco local (`uploads/`), que não persiste
+  entre invocações serverless. Os uploads funcionam durante a requisição mas
+  o arquivo pode não estar disponível depois — para produção real na Vercel,
+  trocar por um storage externo (Vercel Blob, S3, etc.).
+- O rate limit de login é em memória (por instância). Em serverless
+  multi-instância a proteção fica parcial — trocar por Redis/Upstash se
+  brute force for uma preocupação real.

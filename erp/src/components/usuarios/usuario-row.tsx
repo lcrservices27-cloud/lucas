@@ -53,7 +53,7 @@ export function UsuarioRow({ usuario, isSelf }: { usuario: UsuarioItem; isSelf: 
         </div>
       </TableCell>
       <TableCell>
-        <Select value={usuario.papel} onValueChange={handlePapelChange} disabled={pending}>
+        <Select value={usuario.papel} onValueChange={handlePapelChange} disabled={pending || isSelf}>
           <SelectTrigger className="w-[160px]">
             <SelectValue />
           </SelectTrigger>

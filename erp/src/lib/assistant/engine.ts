@@ -24,9 +24,20 @@ export async function processarTurno(
   historico: AssistenteTurno[],
   usuarioId: string
 ): Promise<AssistenteResposta> {
-  const resposta = assistantConfigured()
-    ? await processarComLLM(texto, contexto, historico, usuarioId)
-    : await processarHeuristica(texto, contexto, usuarioId);
+  let resposta: AssistenteResposta;
+
+  if (assistantConfigured()) {
+    try {
+      resposta = await processarComLLM(texto, contexto, historico, usuarioId);
+    } catch (err) {
+      // API do LLM indisponível (rede, quota, chave inválida): degrada para o
+      // interpretador por regras em vez de falhar o turno inteiro.
+      console.error("LLM indisponível, usando interpretador por regras:", err);
+      resposta = await processarHeuristica(texto, contexto, usuarioId);
+    }
+  } else {
+    resposta = await processarHeuristica(texto, contexto, usuarioId);
+  }
 
   await prisma.assistenteInteracao.create({
     data: {
