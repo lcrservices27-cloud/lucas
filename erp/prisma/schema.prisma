@@ -1,0 +1,351 @@
+// Lucas Limpa Nome ERP — schema principal
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Usuarios / Permissoes
+// ---------------------------------------------------------------------------
+
+enum PapelUsuario {
+  ADMINISTRADOR
+  FINANCEIRO
+  ATENDIMENTO
+  CONSULTOR
+  JURIDICO
+}
+
+model Usuario {
+  id            String   @id @default(cuid())
+  nome          String
+  email         String   @unique
+  senhaHash     String
+  papel         PapelUsuario @default(ATENDIMENTO)
+  avatarUrl     String?
+  ativo         Boolean  @default(true)
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+
+  clientesResponsavel Cliente[]        @relation("ClienteResponsavel")
+  tarefasResponsavel  Tarefa[]         @relation("TarefaResponsavel")
+  tarefasCriadas      Tarefa[]         @relation("TarefaCriador")
+  eventos             Evento[]
+  observacoes         Observacao[]
+  timelineEntradas    TimelineEntrada[]
+  documentosEnviados  Documento[]
+  pagamentosRegistrados Pagamento[]
+
+  @@map("usuarios")
+}
+
+// ---------------------------------------------------------------------------
+// Cliente (CRM)
+// ---------------------------------------------------------------------------
+
+enum StatusComercial {
+  NOVO_LEAD
+  PRIMEIRO_CONTATO
+  NEGOCIACAO
+  AGUARDANDO_PIX
+  ENTRADA_RECEBIDA
+  VENDA_FECHADA
+  CANCELADO
+}
+
+enum StatusJuridico {
+  AGUARDANDO_DOCUMENTOS
+  DOCUMENTOS_RECEBIDOS
+  AGUARDANDO_ENVIO
+  ENVIADO_AO_PARCEIRO
+  EM_ANALISE
+  PROCESSO_PROTOCOLADO
+  AGUARDANDO_DECISAO
+  CONCLUIDO
+  AGUARDANDO_PAGAMENTO_FINAL
+  FINALIZADO
+  CANCELADO
+}
+
+enum StatusFinanceiro {
+  NAO_INICIADO
+  ENTRADA_PAGA
+  PAGAMENTO_PARCIAL
+  PAGO
+  ATRASADO
+  CANCELADO
+}
+
+enum FormaPagamento {
+  A_VISTA
+  ENTRADA_MAIS_PARCELAS
+  PARCELADO
+}
+
+model Cliente {
+  id               String   @id @default(cuid())
+  nome             String
+  cpf              String?  @unique
+  rg               String?
+  telefone         String?
+  whatsapp         String?
+  email            String?
+  cidade           String?
+  estado           String?
+  endereco         String?
+  origemLead       String?
+  responsavelId    String?
+  responsavel      Usuario? @relation("ClienteResponsavel", fields: [responsavelId], references: [id])
+  dataEntrada      DateTime @default(now())
+
+  statusComercial  StatusComercial  @default(NOVO_LEAD)
+  statusJuridico   StatusJuridico   @default(AGUARDANDO_DOCUMENTOS)
+  statusFinanceiro StatusFinanceiro @default(NAO_INICIADO)
+
+  valorContratado  Decimal @default(0) @db.Decimal(12, 2)
+  formaPagamento   FormaPagamento?
+  numeroParcelas   Int?
+
+  fotoUrl          String?
+
+  criadoEm         DateTime @default(now())
+  atualizadoEm     DateTime @updatedAt
+
+  parcelas         Parcela[]
+  pagamentos       Pagamento[]
+  documentos       Documento[]
+  observacoes      Observacao[]
+  timelineEntradas TimelineEntrada[]
+  tarefas          Tarefa[]
+  eventos          Evento[]
+
+  @@index([nome])
+  @@index([statusComercial])
+  @@index([statusJuridico])
+  @@index([statusFinanceiro])
+  @@map("clientes")
+}
+
+// ---------------------------------------------------------------------------
+// Financeiro
+// ---------------------------------------------------------------------------
+
+enum StatusParcela {
+  PENDENTE
+  PAGA
+  ATRASADA
+  CANCELADA
+}
+
+model Parcela {
+  id          String   @id @default(cuid())
+  clienteId   String
+  cliente     Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  numero      Int
+  valor       Decimal  @db.Decimal(12, 2)
+  vencimento  DateTime
+  status      StatusParcela @default(PENDENTE)
+  pagamento   Pagamento?
+
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@index([clienteId])
+  @@index([vencimento])
+  @@map("parcelas")
+}
+
+enum TipoPagamento {
+  ENTRADA
+  PARCELA
+  PAGAMENTO_UNICO
+  PAGAMENTO_FINAL
+}
+
+enum MetodoPagamento {
+  PIX
+  DINHEIRO
+  CARTAO
+  BOLETO
+  TRANSFERENCIA
+}
+
+model Pagamento {
+  id             String   @id @default(cuid())
+  clienteId      String
+  cliente        Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  parcelaId      String?  @unique
+  parcela        Parcela? @relation(fields: [parcelaId], references: [id])
+  tipo           TipoPagamento
+  metodo         MetodoPagamento @default(PIX)
+  valor          Decimal  @db.Decimal(12, 2)
+  dataPagamento  DateTime @default(now())
+  registradoPorId String?
+  registradoPor  Usuario? @relation(fields: [registradoPorId], references: [id])
+  comprovanteUrl String?
+  observacao     String?
+
+  criadoEm       DateTime @default(now())
+
+  @@index([clienteId])
+  @@index([dataPagamento])
+  @@map("pagamentos")
+}
+
+enum TipoLancamento {
+  RECEITA
+  DESPESA
+}
+
+model Lancamento {
+  id          String   @id @default(cuid())
+  tipo        TipoLancamento
+  categoria   String
+  descricao   String
+  valor       Decimal  @db.Decimal(12, 2)
+  data        DateTime @default(now())
+  criadoEm    DateTime @default(now())
+
+  @@index([data])
+  @@index([tipo])
+  @@map("lancamentos")
+}
+
+// ---------------------------------------------------------------------------
+// Documentos
+// ---------------------------------------------------------------------------
+
+enum TipoDocumento {
+  CPF
+  RG
+  CNH
+  CONTRATO
+  COMPROVANTE_PIX
+  PDF
+  IMAGEM
+  OUTRO
+}
+
+model Documento {
+  id           String   @id @default(cuid())
+  clienteId    String
+  cliente      Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  tipo         TipoDocumento @default(OUTRO)
+  nomeArquivo  String
+  url          String
+  tamanho      Int?
+  enviadoPorId String?
+  enviadoPor   Usuario? @relation(fields: [enviadoPorId], references: [id])
+  criadoEm     DateTime @default(now())
+
+  @@index([clienteId])
+  @@map("documentos")
+}
+
+// ---------------------------------------------------------------------------
+// Observacoes / Timeline
+// ---------------------------------------------------------------------------
+
+model Observacao {
+  id         String   @id @default(cuid())
+  clienteId  String
+  cliente    Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  autorId    String?
+  autor      Usuario? @relation(fields: [autorId], references: [id])
+  conteudo   String
+  criadoEm   DateTime @default(now())
+
+  @@index([clienteId])
+  @@map("observacoes")
+}
+
+enum TipoEventoTimeline {
+  CLIENTE_CRIADO
+  STATUS_ALTERADO
+  PAGAMENTO_RECEBIDO
+  DOCUMENTO_ENVIADO
+  OBSERVACAO_CRIADA
+  TAREFA_CRIADA
+  TAREFA_CONCLUIDA
+  LOGIN_REALIZADO
+  OUTRO
+}
+
+model TimelineEntrada {
+  id          String   @id @default(cuid())
+  clienteId   String
+  cliente     Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  tipo        TipoEventoTimeline
+  descricao   String
+  usuarioId   String?
+  usuario     Usuario? @relation(fields: [usuarioId], references: [id])
+  criadoEm    DateTime @default(now())
+
+  @@index([clienteId])
+  @@index([criadoEm])
+  @@map("timeline_entradas")
+}
+
+// ---------------------------------------------------------------------------
+// Tarefas / Agenda
+// ---------------------------------------------------------------------------
+
+enum PrioridadeTarefa {
+  BAIXA
+  MEDIA
+  ALTA
+}
+
+model Tarefa {
+  id             String   @id @default(cuid())
+  titulo         String
+  descricao      String?
+  clienteId      String?
+  cliente        Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  responsavelId  String?
+  responsavel    Usuario? @relation("TarefaResponsavel", fields: [responsavelId], references: [id])
+  criadorId      String?
+  criador        Usuario? @relation("TarefaCriador", fields: [criadorId], references: [id])
+  prioridade     PrioridadeTarefa @default(MEDIA)
+  prazo          DateTime?
+  concluida      Boolean  @default(false)
+  concluidaEm    DateTime?
+
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+
+  @@index([responsavelId])
+  @@index([concluida])
+  @@map("tarefas")
+}
+
+enum TipoEvento {
+  LIGACAO
+  COBRANCA
+  RETORNO
+  DOCUMENTACAO
+  COMPROMISSO
+}
+
+model Evento {
+  id           String   @id @default(cuid())
+  titulo       String
+  tipo         TipoEvento @default(COMPROMISSO)
+  clienteId    String?
+  cliente      Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  responsavelId String?
+  responsavel  Usuario? @relation(fields: [responsavelId], references: [id])
+  inicio       DateTime
+  fim          DateTime?
+  concluido    Boolean  @default(false)
+  observacao   String?
+
+  criadoEm     DateTime @default(now())
+
+  @@index([inicio])
+  @@map("eventos")
+}

@@ -1,0 +1,250 @@
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
+import {
+  type ColumnDef,
+  type SortingState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import type { ClienteListItem } from "@/lib/queries/clientes";
+import {
+  STATUS_COMERCIAL_LABEL,
+  STATUS_COMERCIAL_ORDER,
+  STATUS_JURIDICO_LABEL,
+  STATUS_JURIDICO_ORDER,
+  STATUS_FINANCEIRO_LABEL,
+  STATUS_FINANCEIRO_BADGE,
+} from "@/lib/labels";
+import { formatCurrency, formatDate, initials } from "@/lib/utils";
+
+const columns: ColumnDef<ClienteListItem>[] = [
+  {
+    accessorKey: "nome",
+    header: ({ column }) => (
+      <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Cliente <ArrowUpDown className="size-3.5" />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <Link href={`/crm/${row.original.id}`} className="flex items-center gap-2.5 hover:underline">
+        <Avatar className="size-7">
+          <AvatarFallback className="text-[10px]">{initials(row.original.nome)}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0">
+          <p className="truncate font-medium">{row.original.nome}</p>
+          <p className="truncate text-xs text-muted-foreground">{row.original.cpf ?? "CPF não informado"}</p>
+        </div>
+      </Link>
+    ),
+  },
+  {
+    accessorKey: "telefone",
+    header: "Contato",
+    cell: ({ row }) => (
+      <div className="text-xs">
+        <p>{row.original.whatsapp ?? row.original.telefone ?? "—"}</p>
+        <p className="truncate text-muted-foreground">{row.original.email ?? ""}</p>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "cidade",
+    header: "Cidade",
+    cell: ({ row }) => (
+      <span className="text-sm">
+        {row.original.cidade ? `${row.original.cidade}/${row.original.estado ?? ""}` : "—"}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "statusComercial",
+    header: "Comercial",
+    cell: ({ row }) => <Badge variant="outline">{STATUS_COMERCIAL_LABEL[row.original.statusComercial]}</Badge>,
+    filterFn: (row, id, value) => value === "all" || row.getValue(id) === value,
+  },
+  {
+    accessorKey: "statusJuridico",
+    header: "Jurídico",
+    cell: ({ row }) => <Badge variant="outline">{STATUS_JURIDICO_LABEL[row.original.statusJuridico]}</Badge>,
+    filterFn: (row, id, value) => value === "all" || row.getValue(id) === value,
+  },
+  {
+    accessorKey: "statusFinanceiro",
+    header: "Financeiro",
+    cell: ({ row }) => (
+      <Badge variant={STATUS_FINANCEIRO_BADGE[row.original.statusFinanceiro]}>
+        {STATUS_FINANCEIRO_LABEL[row.original.statusFinanceiro]}
+      </Badge>
+    ),
+    filterFn: (row, id, value) => value === "all" || row.getValue(id) === value,
+  },
+  {
+    accessorKey: "valorContratado",
+    header: ({ column }) => (
+      <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Valor <ArrowUpDown className="size-3.5" />
+      </Button>
+    ),
+    cell: ({ row }) => <span className="tabular-nums">{formatCurrency(row.original.valorContratado)}</span>,
+  },
+  {
+    accessorKey: "responsavel",
+    header: "Responsável",
+    cell: ({ row }) => <span className="text-sm">{row.original.responsavel ?? "—"}</span>,
+  },
+  {
+    accessorKey: "dataEntrada",
+    header: ({ column }) => (
+      <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Entrada <ArrowUpDown className="size-3.5" />
+      </Button>
+    ),
+    cell: ({ row }) => <span className="text-sm">{formatDate(row.original.dataEntrada)}</span>,
+  },
+];
+
+export function ClientesTable({ data }: { data: ClienteListItem[] }) {
+  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [sorting, setSorting] = React.useState<SortingState>([{ id: "dataEntrada", desc: true }]);
+  const [statusComercial, setStatusComercial] = React.useState("all");
+  const [statusJuridico, setStatusJuridico] = React.useState("all");
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    globalFilterFn: (row, _id, filterValue) => {
+      const q = String(filterValue).toLowerCase();
+      const c = row.original;
+      return [c.nome, c.cpf, c.telefone, c.whatsapp, c.email, c.cidade]
+        .filter(Boolean)
+        .some((v) => v!.toLowerCase().includes(q));
+    },
+    initialState: { pagination: { pageSize: 10 } },
+  });
+
+  React.useEffect(() => {
+    table.getColumn("statusComercial")?.setFilterValue(statusComercial);
+  }, [statusComercial, table]);
+
+  React.useEffect(() => {
+    table.getColumn("statusJuridico")?.setFilterValue(statusJuridico);
+  }, [statusJuridico, table]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative max-w-sm flex-1">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome, CPF, telefone, e-mail..."
+            className="pl-8"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+          />
+        </div>
+        <Select value={statusComercial} onValueChange={setStatusComercial}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Status comercial" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todo status comercial</SelectItem>
+            {STATUS_COMERCIAL_ORDER.map((s) => (
+              <SelectItem key={s} value={s}>
+                {STATUS_COMERCIAL_LABEL[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={statusJuridico} onValueChange={setStatusJuridico}>
+          <SelectTrigger className="w-[190px]">
+            <SelectValue placeholder="Status jurídico" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todo status jurídico</SelectItem>
+            {STATUS_JURIDICO_ORDER.map((s) => (
+              <SelectItem key={s} value={s}>
+                {STATUS_JURIDICO_LABEL[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <span className="ml-auto text-sm text-muted-foreground">
+          {table.getFilteredRowModel().rows.length} de {data.length} clientes
+        </span>
+      </div>
+
+      <div className="rounded-lg border bg-card">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((hg) => (
+              <TableRow key={hg.id}>
+                {hg.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                  Nenhum cliente encontrado.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Página {table.getState().pagination.pageIndex + 1} de {Math.max(table.getPageCount(), 1)}
+        </p>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+            <ChevronLeft className="size-4" /> Anterior
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+            Próxima <ChevronRight className="size-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

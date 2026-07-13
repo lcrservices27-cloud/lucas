@@ -1,0 +1,113 @@
+"use client";
+
+import * as React from "react";
+import { Pencil } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { ClienteForm } from "@/components/crm/cliente-form";
+import { updateCliente } from "@/lib/actions/clientes";
+import type { ClienteFormValues } from "@/lib/validators/cliente";
+import { STATUS_COMERCIAL_LABEL, STATUS_JURIDICO_LABEL, STATUS_FINANCEIRO_LABEL, STATUS_FINANCEIRO_BADGE } from "@/lib/labels";
+import { formatCurrency, formatDate, initials } from "@/lib/utils";
+import type { ClienteDetail } from "@/lib/queries/cliente-detail";
+
+export function ClienteHeader({
+  cliente,
+  usuarios,
+  saldo,
+}: {
+  cliente: ClienteDetail;
+  usuarios: { id: string; nome: string }[];
+  saldo: number;
+}) {
+  const [open, setOpen] = React.useState(false);
+
+  async function handleSubmit(values: ClienteFormValues) {
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(values)) {
+      if (value !== undefined && value !== null) formData.set(key, String(value));
+    }
+    const result = await updateCliente(cliente.id, {}, formData);
+    if (!result?.error && !result?.fieldErrors) setOpen(false);
+    return result;
+  }
+
+  return (
+    <div className="flex flex-col gap-4 rounded-xl border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-4">
+        <Avatar className="size-14">
+          <AvatarFallback className="text-lg">{initials(cliente.nome)}</AvatarFallback>
+        </Avatar>
+        <div>
+          <h1 className="text-xl font-semibold">{cliente.nome}</h1>
+          <p className="text-sm text-muted-foreground">
+            {cliente.cpf ?? "CPF não informado"} · Cliente desde {formatDate(cliente.dataEntrada)}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <Badge variant="outline">{STATUS_COMERCIAL_LABEL[cliente.statusComercial]}</Badge>
+            <Badge variant="outline">{STATUS_JURIDICO_LABEL[cliente.statusJuridico]}</Badge>
+            <Badge variant={STATUS_FINANCEIRO_BADGE[cliente.statusFinanceiro]}>
+              {STATUS_FINANCEIRO_LABEL[cliente.statusFinanceiro]}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-6">
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground">Valor contratado</p>
+          <p className="font-semibold">{formatCurrency(Number(cliente.valorContratado))}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground">Saldo</p>
+          <p className={`font-semibold ${saldo > 0 ? "text-warning" : "text-success"}`}>{formatCurrency(saldo)}</p>
+        </div>
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Pencil /> Editar
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
+            <SheetHeader>
+              <SheetTitle>Editar cliente</SheetTitle>
+              <SheetDescription>Atualize os dados cadastrais de {cliente.nome}.</SheetDescription>
+            </SheetHeader>
+            <div className="px-4 pb-4">
+              <ClienteForm
+                usuarios={usuarios}
+                onSubmit={handleSubmit}
+                submitLabel="Salvar alterações"
+                defaultValues={{
+                  nome: cliente.nome,
+                  cpf: cliente.cpf ?? "",
+                  rg: cliente.rg ?? "",
+                  telefone: cliente.telefone ?? "",
+                  whatsapp: cliente.whatsapp ?? "",
+                  email: cliente.email ?? "",
+                  cidade: cliente.cidade ?? "",
+                  estado: cliente.estado ?? "",
+                  endereco: cliente.endereco ?? "",
+                  origemLead: cliente.origemLead ?? "",
+                  responsavelId: cliente.responsavelId ?? "",
+                  valorContratado: Number(cliente.valorContratado),
+                  formaPagamento: cliente.formaPagamento ?? "",
+                  numeroParcelas: cliente.numeroParcelas ?? undefined,
+                }}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </div>
+  );
+}
