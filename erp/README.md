@@ -53,3 +53,27 @@ Todos com a senha `lucas123`:
 Uploads de documentos são gravados em `public/uploads/<clienteId>/` (disco
 local — adequado para deploy self-hosted; trocar por um storage externo em
 produção multi-instância).
+
+## Deploy na Vercel
+
+O app fica na pasta `erp/` deste repositório, não na raiz — isso precisa ser
+configurado manualmente ao importar o projeto.
+
+1. **vercel.com/new** → importe este repositório GitHub.
+2. Em **Root Directory**, selecione `erp` (obrigatório — sem isso o build
+   falha, pois a raiz do repo não tem o projeto Next.js).
+3. Crie um Postgres gerenciado (aba **Storage** do projeto na Vercel →
+   Neon/Vercel Postgres, ambos têm free tier) e conecte ao projeto — isso
+   preenche `DATABASE_URL` automaticamente nas Environment Variables.
+4. Adicione manualmente a variável `AUTH_SECRET` (uma string aleatória longa,
+   ex.: `openssl rand -hex 32`).
+5. Deploy. O `build` script já roda `prisma migrate deploy` antes do
+   `next build`, então o schema é aplicado automaticamente a cada deploy.
+6. (Opcional) Para popular com dados de exemplo, rode localmente uma vez
+   apontando para o banco de produção: `DATABASE_URL="<url-da-vercel>" pnpm db:seed`.
+
+**Limitação conhecida:** o upload de documentos grava em disco local
+(`public/uploads`), que não persiste entre invocações serverless na Vercel.
+Os uploads funcionam durante a requisição mas o arquivo pode não estar
+disponível depois — para produção real na Vercel, trocar por um storage
+externo (Vercel Blob, S3, etc.).
