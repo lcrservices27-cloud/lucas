@@ -1,7 +1,8 @@
 # Lucas Limpa Nome — ERP
 
 Sistema operacional interno da Lucas Limpa Nome: CRM, Kanban comercial e
-jurídico, financeiro, agenda, tarefas, relatórios e gestão de usuários.
+jurídico, financeiro, agenda, tarefas, relatórios, gestão de usuários e um
+assistente de voz com IA integrado.
 
 ## Stack
 
@@ -54,6 +55,35 @@ Uploads de documentos são gravados em `public/uploads/<clienteId>/` (disco
 local — adequado para deploy self-hosted; trocar por um storage externo em
 produção multi-instância).
 
+## Assistente de voz com IA
+
+Botão flutuante (canto inferior direito) disponível em todo o sistema.
+Reconhecimento e síntese de voz usam a Web Speech API do navegador (grátis,
+sem chave — funciona bem em Chrome/Edge; um campo de texto sempre serve como
+alternativa). O painel tem duas abas: **Conversa** e **Histórico** (registra
+quem falou, quando e qual ação foi executada — `AssistenteInteracao` no
+schema).
+
+Suporta cadastro de cliente por etapas (com confirmação antes de salvar),
+registrar pagamento, mover cliente no kanban, buscar clientes por filtro,
+abrir ficha de cliente, responder perguntas financeiras, criar tarefa +
+evento na agenda, e listar processos parados — tudo por comando de voz ou
+texto em linguagem natural.
+
+A interpretação de intenção tem dois modos, escolhidos automaticamente:
+
+- **Sem `ANTHROPIC_API_KEY`** (padrão): interpretador por regras
+  (`src/lib/assistant/heuristica.ts`), sem custo, cobre os comandos descritos
+  acima.
+- **Com `ANTHROPIC_API_KEY`** configurada: usa o Claude com tool-use
+  (`src/lib/assistant/llm.ts`) para entender linguagem livre, sem exigir
+  frases exatas. Gere a chave em console.anthropic.com e defina também
+  `ASSISTANT_MODEL` se quiser um modelo diferente do padrão.
+
+Ambos os modos chamam as mesmas ações do sistema (`src/lib/assistant/tools.ts`),
+então o comportamento final é idêntico — só muda a flexibilidade de
+linguagem aceita.
+
 ## Deploy na Vercel
 
 O app fica na pasta `erp/` deste repositório, não na raiz — isso precisa ser
@@ -66,7 +96,9 @@ configurado manualmente ao importar o projeto.
    Neon/Vercel Postgres, ambos têm free tier) e conecte ao projeto — isso
    preenche `DATABASE_URL` automaticamente nas Environment Variables.
 4. Adicione manualmente a variável `AUTH_SECRET` (uma string aleatória longa,
-   ex.: `openssl rand -hex 32`).
+   ex.: `openssl rand -hex 32`). Opcional: `ANTHROPIC_API_KEY` para o
+   assistente de voz entender linguagem livre (sem ela, funciona em modo
+   básico por regras).
 5. Deploy. O `build` script já roda `prisma migrate deploy` antes do
    `next build`, então o schema é aplicado automaticamente a cada deploy.
 6. (Opcional) Para popular com dados de exemplo, rode localmente uma vez

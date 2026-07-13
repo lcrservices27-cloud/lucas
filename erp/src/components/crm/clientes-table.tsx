@@ -33,6 +33,7 @@ import {
   STATUS_JURIDICO_ORDER,
   STATUS_FINANCEIRO_LABEL,
   STATUS_FINANCEIRO_BADGE,
+  STATUS_FINANCEIRO_ORDER,
 } from "@/lib/labels";
 import { formatCurrency, formatDate, initials } from "@/lib/utils";
 
@@ -122,11 +123,20 @@ const columns: ColumnDef<ClienteListItem>[] = [
   },
 ];
 
-export function ClientesTable({ data }: { data: ClienteListItem[] }) {
+export function ClientesTable({
+  data,
+  initialStatusFinanceiro,
+  initialStatusJuridico,
+}: {
+  data: ClienteListItem[];
+  initialStatusFinanceiro?: string;
+  initialStatusJuridico?: string;
+}) {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([{ id: "dataEntrada", desc: true }]);
   const [statusComercial, setStatusComercial] = React.useState("all");
-  const [statusJuridico, setStatusJuridico] = React.useState("all");
+  const [statusJuridico, setStatusJuridico] = React.useState(initialStatusJuridico || "all");
+  const [statusFinanceiro, setStatusFinanceiro] = React.useState(initialStatusFinanceiro || "all");
 
   const table = useReactTable({
     data,
@@ -155,6 +165,10 @@ export function ClientesTable({ data }: { data: ClienteListItem[] }) {
   React.useEffect(() => {
     table.getColumn("statusJuridico")?.setFilterValue(statusJuridico);
   }, [statusJuridico, table]);
+
+  React.useEffect(() => {
+    table.getColumn("statusFinanceiro")?.setFilterValue(statusFinanceiro);
+  }, [statusFinanceiro, table]);
 
   return (
     <div className="space-y-3">
@@ -190,6 +204,19 @@ export function ClientesTable({ data }: { data: ClienteListItem[] }) {
             {STATUS_JURIDICO_ORDER.map((s) => (
               <SelectItem key={s} value={s}>
                 {STATUS_JURIDICO_LABEL[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={statusFinanceiro} onValueChange={setStatusFinanceiro}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Status financeiro" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todo status financeiro</SelectItem>
+            {STATUS_FINANCEIRO_ORDER.map((s) => (
+              <SelectItem key={s} value={s}>
+                {STATUS_FINANCEIRO_LABEL[s]}
               </SelectItem>
             ))}
           </SelectContent>

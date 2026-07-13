@@ -39,6 +39,7 @@ model Usuario {
   timelineEntradas    TimelineEntrada[]
   documentosEnviados  Documento[]
   pagamentosRegistrados Pagamento[]
+  interacoesAssistente AssistenteInteracao[]
 
   @@map("usuarios")
 }
@@ -348,4 +349,37 @@ model Evento {
 
   @@index([inicio])
   @@map("eventos")
+}
+
+// ---------------------------------------------------------------------------
+// Assistente de voz com IA
+// ---------------------------------------------------------------------------
+
+enum TipoAcaoAssistente {
+  CRIAR_CLIENTE
+  REGISTRAR_PAGAMENTO
+  MOVER_KANBAN
+  BUSCAR_CLIENTES
+  ABRIR_CLIENTE
+  RESPONDER_PERGUNTA
+  CRIAR_TAREFA
+  RELATORIO
+  CANCELADO
+  ERRO
+}
+
+model AssistenteInteracao {
+  id           String   @id @default(cuid())
+  usuarioId    String?
+  usuario      Usuario? @relation(fields: [usuarioId], references: [id])
+  transcricao  String
+  resposta     String?
+  tipoAcao     TipoAcaoAssistente?
+  payload      Json?
+  executada    Boolean  @default(false)
+  criadoEm     DateTime @default(now())
+
+  @@index([usuarioId])
+  @@index([criadoEm])
+  @@map("assistente_interacoes")
 }

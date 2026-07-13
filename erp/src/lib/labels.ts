@@ -55,6 +55,15 @@ export const STATUS_FINANCEIRO_LABEL: Record<string, string> = {
   CANCELADO: "Cancelado",
 };
 
+export const STATUS_FINANCEIRO_ORDER = [
+  "NAO_INICIADO",
+  "ENTRADA_PAGA",
+  "PAGAMENTO_PARCIAL",
+  "PAGO",
+  "ATRASADO",
+  "CANCELADO",
+];
+
 export const STATUS_FINANCEIRO_BADGE: Record<string, "default" | "secondary" | "destructive" | "outline" | "success" | "warning"> = {
   NAO_INICIADO: "outline",
   ENTRADA_PAGA: "secondary",

@@ -1,6 +1,7 @@
 import { requireUser, PAPEL_LABEL } from "@/lib/auth";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
+import { VoiceAssistant } from "@/components/assistant/voice-assistant";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const usuario = await requireUser();
@@ -19,6 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
       </div>
+      <VoiceAssistant />
     </div>
   );
 }
