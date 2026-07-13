@@ -1,0 +1,86 @@
+name: Deploy na Vercel
+
+on:
+  push:
+    branches:
+      - main
+      - claude/lucas-limpa-nome-erp-emb4w5
+    paths:
+      - "erp/**"
+      - ".github/workflows/deploy-vercel.yml"
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "Popular o banco com dados de exemplo (APAGA os dados atuais!)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-vercel
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Checar segredos do repositório
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+        run: |
+          missing=""
+          [ -z "$VERCEL_TOKEN" ] && missing="$missing VERCEL_TOKEN"
+          [ -z "$DATABASE_URL" ] && missing="$missing DATABASE_URL"
+          [ -z "$AUTH_SECRET" ] && missing="$missing AUTH_SECRET"
+          if [ -n "$missing" ]; then
+            echo "::error::Faltam secrets:$missing — adicione em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Vincular projeto na Vercel
+        working-directory: erp
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel@latest link --yes --project lucas-limpa-nome-erp --token "$VERCEL_TOKEN"
+
+      - name: Configurar variáveis de ambiente de produção
+        working-directory: erp
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+        run: |
+          printf '%s' "$DATABASE_URL" | npx vercel@latest env add DATABASE_URL production --force --token "$VERCEL_TOKEN"
+          printf '%s' "$AUTH_SECRET" | npx vercel@latest env add AUTH_SECRET production --force --token "$VERCEL_TOKEN"
+
+      - name: Popular banco com dados de exemplo (opcional)
+        if: github.event_name == 'workflow_dispatch' && inputs.seed
+        working-directory: erp
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+          pnpm prisma migrate deploy
+          pnpm db:seed
+
+      - name: Deploy de produção
+        id: deploy
+        working-directory: erp
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          url=$(npx vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Deploy concluído"
+            echo ""
+            echo "URL de produção: $url"
+          } >> "$GITHUB_STEP_SUMMARY"
