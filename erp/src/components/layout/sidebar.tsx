@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -12,9 +13,13 @@ export function Sidebar({ className, isAdmin = true }: { className?: string; isA
   return (
     <nav className={cn("flex h-full w-64 flex-col gap-1 border-r bg-sidebar p-3 text-sidebar-foreground", className)}>
       <div className="flex items-center gap-2 px-2 py-3">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary font-bold text-sidebar-primary-foreground">
-          L
-        </div>
+        <Image
+          src="/marca/logo-icone.png"
+          alt=""
+          width={512}
+          height={512}
+          className="size-8 shrink-0 dark:invert"
+        />
         <div className="leading-tight">
           <p className="text-sm font-semibold">Lucas Limpa Nome</p>
           <p className="text-xs text-muted-foreground">ERP</p>
