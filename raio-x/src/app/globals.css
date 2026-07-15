@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #06122b;
+  --color-navy-900: #0a1f3c;
+  --color-navy-800: #0d2a52;
+  --color-navy-700: #123670;
+  --color-navy-600: #1a4795;
+  --color-navy-500: #2563eb;
+  --color-navy-400: #4f86f0;
+
+  --color-brand-blue: #1d4ed8;
+
+  --color-green-700: #047857;
+  --color-green-600: #059669;
+  --color-green-500: #10b981;
+  --color-green-400: #34d399;
+
+  --color-ink: #0a1f3c;
+  --color-ink-soft: #3f5578;
+  --color-mist: #f5f8fc;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 10px 40px -12px rgb(10 31 60 / 0.18);
+  --shadow-glow: 0 20px 60px -20px rgb(37 99 235 / 0.35);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Glassmorphism leve */
+.glass {
+  background: color-mix(in srgb, white 72%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in srgb, white 60%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
+.glass-dark {
+  background: color-mix(in srgb, #0a1f3c 55%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgb(255 255 255 / 0.12);
+}
+
+/* Fundos gradientes — inclui as linhas de grade como camadas superiores,
+   para não colidir com uma classe separada que sobrescreveria o gradiente. */
+.bg-hero {
+  background-color: #0a1f3c;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    radial-gradient(60% 50% at 50% 0%, rgb(37 99 235 / 0.2), transparent 70%),
+    radial-gradient(50% 40% at 85% 20%, rgb(16 185 129 / 0.16), transparent 70%),
+    linear-gradient(180deg, #06122b 0%, #0a1f3c 55%, #0b2545 100%);
+  background-size: 44px 44px, 44px 44px, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
+}
+
+.bg-mist {
+  background:
+    radial-gradient(60% 40% at 50% -10%, rgb(37 99 235 / 0.08), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, var(--color-mist) 100%);
+}
+
+.text-gradient-green {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, #0a1f3c 8%, transparent) 30%,
+    color-mix(in srgb, #2563eb 14%, transparent) 50%,
+    color-mix(in srgb, #0a1f3c 8%, transparent) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

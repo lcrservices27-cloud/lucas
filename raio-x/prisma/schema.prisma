@@ -1,0 +1,75 @@
+// Raio-X do Crédito — funil de diagnóstico financeiro
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Objetivo {
+  EMPRESTIMO
+  FINANCIAMENTO
+  CARTAO
+  LIMPAR_NOME
+  OUTRO
+}
+
+enum RespostaRecusado {
+  SIM
+  NAO
+  NUNCA
+}
+
+enum RespostaTriplo {
+  SIM
+  NAO
+  NAO_SEI
+}
+
+enum FaixaScore {
+  ATE_300
+  DE_301_500
+  DE_501_700
+  ACIMA_700
+  NAO_SEI
+}
+
+enum StatusIndice {
+  ATENCAO
+  MODERADO
+  SAUDAVEL
+}
+
+model Diagnostico {
+  id             String   @id @default(cuid())
+  nome           String
+  cpf            String
+  objetivo       Objetivo
+  recusado       RespostaRecusado
+  dividas        RespostaTriplo
+  negativado     RespostaTriplo
+  faixaScore     FaixaScore
+  indice         Int
+  status         StatusIndice
+
+  // Atribuição de tráfego (UTM vindos do anúncio)
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  referrer       String?
+
+  // Conversão (marcada no painel admin quando vira venda)
+  converteu      Boolean  @default(false)
+  convertidoEm   DateTime?
+
+  criadoEm       DateTime @default(now())
+
+  @@index([cpf])
+  @@index([criadoEm])
+  @@index([status])
+  @@index([converteu])
+  @@index([utmSource])
+  @@map("diagnosticos")
+}
