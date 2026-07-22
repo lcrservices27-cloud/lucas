@@ -1,6 +1,5 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
-import { parseDataHoraPtBr } from "@/lib/assistant/data-parser";
 import { formatCurrency } from "@/lib/utils";
 import {
   buscarClientesCandidatos,
@@ -8,8 +7,6 @@ import {
   responderPerguntaFinanceira,
   moverClienteKanban,
   registrarPagamentoAssistente,
-  criarTarefaAssistente,
-  formatarQuando,
   uiDeResultadoBusca,
 } from "@/lib/assistant/tools";
 import type {
@@ -103,19 +100,6 @@ const TOOLS: Anthropic.Tool[] = [
     },
   },
   {
-    name: "criar_tarefa",
-    description: "Cria uma tarefa (e evento na agenda) para um usuário, opcionalmente relacionada a um cliente.",
-    input_schema: {
-      type: "object",
-      properties: {
-        titulo: { type: "string" },
-        nome_cliente: { type: "string" },
-        quando: { type: "string", description: "Expressão temporal em português, ex: 'amanhã às 14 horas'." },
-      },
-      required: ["titulo", "quando"],
-    },
-  },
-  {
     name: "responder",
     description: "Responde diretamente ao usuário sem executar nenhuma ação (esclarecimentos, saudações, respostas que não se encaixam nas outras ferramentas).",
     input_schema: {
@@ -183,7 +167,7 @@ async function executarFerramenta(
   nome: string,
   input: Record<string, unknown>,
   contexto: AssistenteContexto,
-  usuarioId: string
+  _usuarioId: string
 ): Promise<AssistenteResposta> {
   const str = (v: unknown) => (typeof v === "string" ? v : undefined);
   const num = (v: unknown) => (typeof v === "number" ? v : undefined);
@@ -331,28 +315,6 @@ async function executarFerramenta(
         contexto: { modo: "idle" },
         ui: { kind: "none" },
         tipoAcao: "RESPONDER_PERGUNTA",
-        executada: true,
-      };
-    }
-
-    case "criar_tarefa": {
-      const titulo = str(input.titulo) ?? "Tarefa";
-      const nomeCliente = str(input.nome_cliente);
-      const quandoTexto = str(input.quando) ?? "amanhã às 9 horas";
-      const quando = parseDataHoraPtBr(quandoTexto);
-
-      let clienteId: string | null = null;
-      if (nomeCliente) {
-        const candidatos = await buscarClientesCandidatos(nomeCliente);
-        if (candidatos.length === 1) clienteId = candidatos[0].id;
-      }
-
-      await criarTarefaAssistente(usuarioId, titulo, clienteId, quando);
-      return {
-        fala: `Tarefa criada: "${titulo}" para ${formatarQuando(quando)}. Também adicionei na agenda.`,
-        contexto: { modo: "idle" },
-        ui: { kind: "navigate", href: "/tarefas" },
-        tipoAcao: "CRIAR_TAREFA",
         executada: true,
       };
     }

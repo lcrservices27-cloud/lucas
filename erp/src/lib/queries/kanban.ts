@@ -8,18 +8,32 @@ export async function getClientesKanban() {
       nome: true,
       cidade: true,
       estado: true,
+      produto: true,
       valorContratado: true,
       statusComercial: true,
       atualizadoEm: true,
       responsavel: { select: { nome: true } },
+      pagamentos: { select: { valor: true } },
     },
   });
 
-  return clientes.map((c) => ({
-    ...c,
-    valorContratado: Number(c.valorContratado),
-    responsavel: c.responsavel?.nome ?? null,
-  }));
+  return clientes.map((c) => {
+    const total = Number(c.valorContratado);
+    const pago = c.pagamentos.reduce((s, p) => s + Number(p.valor), 0);
+    return {
+      id: c.id,
+      nome: c.nome,
+      cidade: c.cidade,
+      estado: c.estado,
+      produto: c.produto,
+      valorContratado: total,
+      pago,
+      restante: Math.max(0, total - pago),
+      statusComercial: c.statusComercial,
+      atualizadoEm: c.atualizadoEm,
+      responsavel: c.responsavel?.nome ?? null,
+    };
+  });
 }
 
 export type KanbanCliente = Awaited<ReturnType<typeof getClientesKanban>>[number];

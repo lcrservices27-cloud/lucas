@@ -1,14 +1,11 @@
 import "server-only";
 import { normalizar, extrairNumero, extrairDigitos } from "@/lib/assistant/normalize";
-import { parseDataHoraPtBr } from "@/lib/assistant/data-parser";
 import {
   buscarClientesCandidatos,
   buscarClientesPorFiltro,
   responderPerguntaFinanceira,
   moverClienteKanban,
   registrarPagamentoAssistente,
-  criarTarefaAssistente,
-  formatarQuando,
   uiDeResultadoBusca,
 } from "@/lib/assistant/tools";
 import { formatCurrency } from "@/lib/utils";
@@ -42,7 +39,7 @@ function resumoDraft(draft: AssistenteDraftCliente) {
 export async function processarHeuristica(
   textoOriginal: string,
   contexto: AssistenteContexto,
-  usuarioId: string
+  _usuarioId: string
 ): Promise<AssistenteResposta> {
   const textoLower = textoOriginal.toLowerCase().trim();
   const t = normalizar(textoOriginal);
@@ -327,40 +324,6 @@ export async function processarHeuristica(
       contexto: { modo: "idle" },
       ui: uiDeResultadoBusca(resultado),
       tipoAcao: "RELATORIO",
-      executada: true,
-    };
-  }
-
-  const tarefaMatch = textoLower.match(/(?:crie|criar|cria)\s+uma?\s+tarefa\s+(.+)/i);
-  if (tarefaMatch) {
-    const resto = tarefaMatch[1].replace(/[.?!]+$/, "").trim();
-    const paraMatch = resto.match(/para\s+ligar\s+para\s+(.+)/i) ?? resto.match(/para\s+(.+)/i);
-    let clienteNome: string | null = null;
-    let titulo = `Tarefa: ${resto}`;
-
-    if (paraMatch) {
-      const restoDepoisPara = paraMatch[1];
-      const restoNorm = normalizar(restoDepoisPara);
-      const nomeMatch = restoNorm.match(/^([a-z\s]+?)(?:\s+amanha|\s+hoje|\s+depois|\s+segunda|\s+terca|\s+quarta|\s+quinta|\s+sexta|\s+sabado|\s+domingo|\s+\d|$)/i);
-      if (nomeMatch) {
-        clienteNome = restoDepoisPara.slice(0, nomeMatch[1].length).trim();
-        titulo = `Ligar para ${capitalizarNome(clienteNome)}`;
-      }
-    }
-
-    const quando = parseDataHoraPtBr(resto);
-    let clienteId: string | null = null;
-    if (clienteNome) {
-      const candidatos = await buscarClientesCandidatos(clienteNome);
-      if (candidatos.length === 1) clienteId = candidatos[0].id;
-    }
-
-    await criarTarefaAssistente(usuarioId, titulo, clienteId, quando);
-    return {
-      fala: `Tarefa criada: "${titulo}" para ${formatarQuando(quando)}. Também adicionei na agenda.`,
-      contexto: { modo: "idle" },
-      ui: { kind: "navigate", href: "/tarefas" },
-      tipoAcao: "CRIAR_TAREFA",
       executada: true,
     };
   }

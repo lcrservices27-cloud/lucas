@@ -31,7 +31,6 @@ export default async function UsuariosPage() {
                 <TableHead>Usuário</TableHead>
                 <TableHead>Papel</TableHead>
                 <TableHead>Carteira</TableHead>
-                <TableHead>Tarefas</TableHead>
                 <TableHead>Desde</TableHead>
                 <TableHead>Ativo</TableHead>
               </TableRow>

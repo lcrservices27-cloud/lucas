@@ -32,8 +32,6 @@ model Usuario {
   atualizadoEm  DateTime @updatedAt
 
   clientesResponsavel Cliente[]        @relation("ClienteResponsavel")
-  tarefasResponsavel  Tarefa[]         @relation("TarefaResponsavel")
-  tarefasCriadas      Tarefa[]         @relation("TarefaCriador")
   eventos             Evento[]
   observacoes         Observacao[]
   timelineEntradas    TimelineEntrada[]
@@ -49,13 +47,15 @@ model Usuario {
 // ---------------------------------------------------------------------------
 
 enum StatusComercial {
-  NOVO_LEAD
-  PRIMEIRO_CONTATO
-  NEGOCIACAO
-  AGUARDANDO_PIX
   ENTRADA_RECEBIDA
+  AGUARDANDO_PIX
   VENDA_FECHADA
   CANCELADO
+}
+
+enum Produto {
+  RATING_COMERCIAL
+  LIMPA_NOME
 }
 
 enum StatusFinanceiro {
@@ -89,7 +89,8 @@ model Cliente {
   responsavel      Usuario? @relation("ClienteResponsavel", fields: [responsavelId], references: [id])
   dataEntrada      DateTime @default(now())
 
-  statusComercial  StatusComercial  @default(NOVO_LEAD)
+  produto          Produto?
+  statusComercial  StatusComercial  @default(ENTRADA_RECEBIDA)
   statusFinanceiro StatusFinanceiro @default(NAO_INICIADO)
 
   valorContratado  Decimal @default(0) @db.Decimal(12, 2)
@@ -106,12 +107,12 @@ model Cliente {
   documentos       Documento[]
   observacoes      Observacao[]
   timelineEntradas TimelineEntrada[]
-  tarefas          Tarefa[]
   eventos          Evento[]
 
   @@index([nome])
   @@index([statusComercial])
   @@index([statusFinanceiro])
+  @@index([produto])
   @@index([atualizadoEm])
   @@map("clientes")
 }
@@ -280,35 +281,6 @@ model TimelineEntrada {
 // ---------------------------------------------------------------------------
 // Tarefas / Agenda
 // ---------------------------------------------------------------------------
-
-enum PrioridadeTarefa {
-  BAIXA
-  MEDIA
-  ALTA
-}
-
-model Tarefa {
-  id             String   @id @default(cuid())
-  titulo         String
-  descricao      String?
-  clienteId      String?
-  cliente        Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
-  responsavelId  String?
-  responsavel    Usuario? @relation("TarefaResponsavel", fields: [responsavelId], references: [id])
-  criadorId      String?
-  criador        Usuario? @relation("TarefaCriador", fields: [criadorId], references: [id])
-  prioridade     PrioridadeTarefa @default(MEDIA)
-  prazo          DateTime?
-  concluida      Boolean  @default(false)
-  concluidaEm    DateTime?
-
-  criadoEm       DateTime @default(now())
-  atualizadoEm   DateTime @updatedAt
-
-  @@index([responsavelId])
-  @@index([concluida])
-  @@map("tarefas")
-}
 
 enum TipoEvento {
   LIGACAO

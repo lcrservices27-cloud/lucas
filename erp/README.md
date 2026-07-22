@@ -1,7 +1,9 @@
 # Lucas Limpa Nome — ERP
 
-Sistema operacional interno da Lucas Limpa Nome: CRM, Kanban comercial,
-financeiro, agenda, tarefas, relatórios, gestão de usuários e um
+Sistema operacional interno da Lucas Limpa Nome: CRM (por produto —
+Rating Comercial / Limpa Nome), Kanban comercial (Entrada Recebida →
+Aguardando Pix → Venda Fechada), financeiro com fluxo de caixa automático,
+agenda, relatórios (histórico operacional), gestão de usuários e um
 assistente de voz com IA integrado.
 
 ## Stack

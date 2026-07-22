@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ExternalLink, MapPin } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, initials } from "@/lib/utils";
+import { PRODUTO_LABEL } from "@/lib/labels";
 import type { KanbanCliente } from "@/lib/queries/kanban";
 
 export function ClienteKanbanCard({ cliente }: { cliente: KanbanCliente }) {
@@ -34,17 +36,30 @@ export function ClienteKanbanCard({ cliente }: { cliente: KanbanCliente }) {
             <ExternalLink className="size-3.5" />
           </Button>
         </div>
-        {cliente.cidade && (
-          <p className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
-            <MapPin className="size-3" /> {cliente.cidade}/{cliente.estado}
-          </p>
+        {cliente.produto && (
+          <Badge variant="secondary" className="mt-1.5 text-[10px]">
+            {PRODUTO_LABEL[cliente.produto]}
+          </Badge>
         )}
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-xs font-medium tabular-nums">{formatCurrency(cliente.valorContratado)}</span>
-          {cliente.responsavel && (
-            <span className="truncate text-[11px] text-muted-foreground">{cliente.responsavel}</span>
+        <div className="mt-2 space-y-0.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Total</span>
+            <span className="font-medium tabular-nums">{formatCurrency(cliente.valorContratado)}</span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Pago</span>
+            <span className="font-medium tabular-nums text-success">{formatCurrency(cliente.pago)}</span>
+          </div>
+          {cliente.restante > 0 && (
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">Restante</span>
+              <span className="font-medium tabular-nums text-warning">{formatCurrency(cliente.restante)}</span>
+            </div>
           )}
         </div>
+        {cliente.responsavel && (
+          <p className="mt-1.5 truncate text-[11px] text-muted-foreground">{cliente.responsavel}</p>
+        )}
       </CardContent>
     </Card>
   );

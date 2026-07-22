@@ -98,9 +98,12 @@ export function ClienteHeader({
                   endereco: cliente.endereco ?? "",
                   origemLead: cliente.origemLead ?? "",
                   responsavelId: cliente.responsavelId ?? "",
+                  produto: cliente.produto ?? undefined,
                   valorContratado: Number(cliente.valorContratado),
-                  formaPagamento: cliente.formaPagamento ?? "",
+                  valorPago: 0,
+                  formaPagamento: cliente.formaPagamento ?? undefined,
                   numeroParcelas: cliente.numeroParcelas ?? undefined,
+                  dataEntrada: new Date(cliente.dataEntrada).toISOString().slice(0, 10),
                 }}
               />
             </div>

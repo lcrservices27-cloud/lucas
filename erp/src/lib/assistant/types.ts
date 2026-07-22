@@ -46,7 +46,6 @@ export type TipoAcao =
   | "BUSCAR_CLIENTES"
   | "ABRIR_CLIENTE"
   | "RESPONDER_PERGUNTA"
-  | "CRIAR_TAREFA"
   | "RELATORIO"
   | "CANCELADO"
   | "ERRO";

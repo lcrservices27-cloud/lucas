@@ -1,22 +1,23 @@
 export const STATUS_COMERCIAL_LABEL: Record<string, string> = {
-  NOVO_LEAD: "Novo Lead",
-  PRIMEIRO_CONTATO: "Primeiro Contato",
-  NEGOCIACAO: "Negociação",
-  AGUARDANDO_PIX: "Aguardando PIX",
   ENTRADA_RECEBIDA: "Entrada Recebida",
+  AGUARDANDO_PIX: "Aguardando PIX",
   VENDA_FECHADA: "Venda Fechada",
   CANCELADO: "Cancelado",
 };
 
+// Colunas do Kanban comercial (CANCELADO é status terminal, fora do board).
 export const STATUS_COMERCIAL_ORDER = [
-  "NOVO_LEAD",
-  "PRIMEIRO_CONTATO",
-  "NEGOCIACAO",
-  "AGUARDANDO_PIX",
   "ENTRADA_RECEBIDA",
+  "AGUARDANDO_PIX",
   "VENDA_FECHADA",
-  "CANCELADO",
 ];
+
+export const PRODUTO_LABEL: Record<string, string> = {
+  RATING_COMERCIAL: "Rating Comercial",
+  LIMPA_NOME: "Limpa Nome",
+};
+
+export const PRODUTO_ORDER = ["RATING_COMERCIAL", "LIMPA_NOME"];
 
 export const STATUS_FINANCEIRO_LABEL: Record<string, string> = {
   NAO_INICIADO: "Não iniciado",
@@ -89,18 +90,6 @@ export const TIPO_DOCUMENTO_LABEL: Record<string, string> = {
   PDF: "PDF",
   IMAGEM: "Imagem",
   OUTRO: "Outro",
-};
-
-export const PRIORIDADE_TAREFA_LABEL: Record<string, string> = {
-  BAIXA: "Baixa",
-  MEDIA: "Média",
-  ALTA: "Alta",
-};
-
-export const PRIORIDADE_TAREFA_BADGE: Record<string, "default" | "secondary" | "destructive" | "outline" | "success" | "warning"> = {
-  BAIXA: "secondary",
-  MEDIA: "warning",
-  ALTA: "destructive",
 };
 
 export const TIPO_EVENTO_LABEL: Record<string, string> = {

@@ -4,7 +4,7 @@ export async function getUsuarios() {
   const usuarios = await prisma.usuario.findMany({
     orderBy: { criadoEm: "asc" },
     include: {
-      _count: { select: { clientesResponsavel: true, tarefasResponsavel: true } },
+      _count: { select: { clientesResponsavel: true } },
     },
   });
   return usuarios;

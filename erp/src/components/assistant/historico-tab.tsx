@@ -21,7 +21,6 @@ const TIPO_LABEL: Record<string, string> = {
   BUSCAR_CLIENTES: "Busca",
   ABRIR_CLIENTE: "Abrir cliente",
   RESPONDER_PERGUNTA: "Pergunta",
-  CRIAR_TAREFA: "Tarefa",
   RELATORIO: "Relatório",
   CANCELADO: "Cancelado",
   ERRO: "Erro",

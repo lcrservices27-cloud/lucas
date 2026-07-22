@@ -7,15 +7,14 @@ import {
   StatusComercial,
   StatusFinanceiro,
   FormaPagamento,
-  StatusParcela,
   TipoPagamento,
   MetodoPagamento,
   TipoDocumento,
   TipoEventoTimeline,
-  PrioridadeTarefa,
   TipoEvento,
   TipoLancamento,
   PapelUsuario,
+  Produto,
 } from "../src/generated/prisma/enums";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
@@ -29,14 +28,7 @@ const ESTADOS_CIDADES: Record<string, string[]> = {
   BA: ["Salvador", "Feira de Santana"],
 };
 
-const ORIGENS_LEAD = [
-  "Instagram Ads",
-  "Google Ads",
-  "Indicação",
-  "WhatsApp",
-  "Site",
-  "Facebook Ads",
-];
+const ORIGENS_LEAD = ["Instagram Ads", "Google Ads", "Indicação", "WhatsApp", "Site", "Facebook Ads"];
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -48,6 +40,17 @@ function randomDateWithinDays(daysBack: number) {
   return new Date(past);
 }
 
+// Mesma regra da aplicação (src/lib/status-cliente.ts).
+function calcularStatus(total: number, pago: number) {
+  if (total > 0 && pago >= total) {
+    return { comercial: StatusComercial.VENDA_FECHADA, financeiro: StatusFinanceiro.PAGO };
+  }
+  if (pago > 0) {
+    return { comercial: StatusComercial.AGUARDANDO_PIX, financeiro: StatusFinanceiro.PAGAMENTO_PARCIAL };
+  }
+  return { comercial: StatusComercial.ENTRADA_RECEBIDA, financeiro: StatusFinanceiro.NAO_INICIADO };
+}
+
 async function main() {
   console.log("Limpando dados existentes...");
   await prisma.timelineEntrada.deleteMany();
@@ -55,7 +58,6 @@ async function main() {
   await prisma.documento.deleteMany();
   await prisma.pagamento.deleteMany();
   await prisma.parcela.deleteMany();
-  await prisma.tarefa.deleteMany();
   await prisma.evento.deleteMany();
   await prisma.lancamento.deleteMany();
   await prisma.cliente.deleteMany();
@@ -74,8 +76,6 @@ async function main() {
     ].map((u) => prisma.usuario.create({ data: { ...u, senhaHash } }))
   );
 
-  const statusComercialList = Object.values(StatusComercial);
-
   console.log("Criando clientes...");
   const totalClientes = 60;
 
@@ -83,34 +83,41 @@ async function main() {
     const nome = faker.person.fullName();
     const estado = pick(Object.keys(ESTADOS_CIDADES));
     const cidade = pick(ESTADOS_CIDADES[estado]);
-    const statusComercial = pick(statusComercialList);
-    const isVendaFechada =
-      statusComercial === "VENDA_FECHADA" || statusComercial === "ENTRADA_RECEBIDA";
+    const produto = pick([Produto.RATING_COMERCIAL, Produto.LIMPA_NOME]);
+    const valorContratado =
+      produto === Produto.RATING_COMERCIAL
+        ? pick([600, 800, 1000])
+        : pick([1200, 1500, 2000, 2500]);
 
-    const valorContratado = isVendaFechada
-      ? faker.number.int({ min: 1500, max: 8000 })
-      : 0;
+    // Cenário de pagamento
+    const cenario = pick(["quitado_avista", "quitado_parcelado", "parcial", "entrada_zero"] as const);
+    let pagamentos: { valor: number; tipo: TipoPagamento; offset: number }[] = [];
+    let formaPagamento: FormaPagamento;
 
-    const formaPagamento = isVendaFechada
-      ? pick([FormaPagamento.A_VISTA, FormaPagamento.ENTRADA_MAIS_PARCELAS, FormaPagamento.PARCELADO])
-      : null;
-
-    const numeroParcelas =
-      formaPagamento === FormaPagamento.PARCELADO || formaPagamento === FormaPagamento.ENTRADA_MAIS_PARCELAS
-        ? faker.number.int({ min: 2, max: 12 })
-        : null;
-
-    let statusFinanceiro: StatusFinanceiro = StatusFinanceiro.NAO_INICIADO;
-    if (isVendaFechada) {
-      statusFinanceiro = pick([
-        StatusFinanceiro.ENTRADA_PAGA,
-        StatusFinanceiro.PAGAMENTO_PARCIAL,
-        StatusFinanceiro.PAGO,
-        StatusFinanceiro.ATRASADO,
-      ]);
+    if (cenario === "quitado_avista") {
+      formaPagamento = FormaPagamento.A_VISTA;
+      pagamentos = [{ valor: valorContratado, tipo: TipoPagamento.PAGAMENTO_UNICO, offset: 0 }];
+    } else if (cenario === "quitado_parcelado") {
+      formaPagamento = FormaPagamento.ENTRADA_MAIS_PARCELAS;
+      const entrada = Math.round(valorContratado / 2);
+      pagamentos = [
+        { valor: entrada, tipo: TipoPagamento.ENTRADA, offset: 0 },
+        { valor: valorContratado - entrada, tipo: TipoPagamento.PARCELA, offset: 30 },
+      ];
+    } else if (cenario === "parcial") {
+      formaPagamento = FormaPagamento.ENTRADA_MAIS_PARCELAS;
+      pagamentos = [{ valor: Math.round(valorContratado / 2), tipo: TipoPagamento.ENTRADA, offset: 0 }];
+    } else {
+      formaPagamento = FormaPagamento.PARCELADO;
+      pagamentos = [];
     }
 
+    const totalPago = pagamentos.reduce((s, p) => s + p.valor, 0);
+    const { comercial, financeiro } = calcularStatus(valorContratado, totalPago);
     const dataEntrada = randomDateWithinDays(180);
+
+    const numeroParcelas =
+      formaPagamento === FormaPagamento.A_VISTA ? null : faker.number.int({ min: 2, max: 12 });
 
     const cliente = await prisma.cliente.create({
       data: {
@@ -126,8 +133,9 @@ async function main() {
         origemLead: pick(ORIGENS_LEAD),
         responsavelId: pick(usuarios).id,
         dataEntrada,
-        statusComercial,
-        statusFinanceiro,
+        produto,
+        statusComercial: comercial,
+        statusFinanceiro: financeiro,
         valorContratado,
         formaPagamento,
         numeroParcelas,
@@ -143,60 +151,27 @@ async function main() {
       },
     });
 
-    // Parcelas + pagamentos para quem já fechou venda
-    if (isVendaFechada && valorContratado > 0) {
-      const parcelasCount = numeroParcelas ?? 1;
-      const valorParcela = Number((valorContratado / parcelasCount).toFixed(2));
-
-      for (let p = 1; p <= parcelasCount; p++) {
-        const vencimento = new Date(dataEntrada);
-        vencimento.setDate(vencimento.getDate() + 30 * p);
-
-        const pago =
-          statusFinanceiro === StatusFinanceiro.PAGO ||
-          (statusFinanceiro === StatusFinanceiro.PAGAMENTO_PARCIAL && p <= Math.ceil(parcelasCount / 2)) ||
-          (statusFinanceiro === StatusFinanceiro.ENTRADA_PAGA && p === 1);
-
-        const atrasada = !pago && vencimento < new Date() && statusFinanceiro === StatusFinanceiro.ATRASADO;
-
-        const parcela = await prisma.parcela.create({
-          data: {
-            clienteId: cliente.id,
-            numero: p,
-            valor: valorParcela,
-            vencimento,
-            status: pago
-              ? StatusParcela.PAGA
-              : atrasada
-                ? StatusParcela.ATRASADA
-                : StatusParcela.PENDENTE,
-          },
-        });
-
-        if (pago) {
-          const dataPagamento = new Date(vencimento);
-          dataPagamento.setDate(dataPagamento.getDate() - faker.number.int({ min: 0, max: 5 }));
-          await prisma.pagamento.create({
-            data: {
-              clienteId: cliente.id,
-              parcelaId: parcela.id,
-              tipo: p === 1 ? TipoPagamento.ENTRADA : TipoPagamento.PARCELA,
-              metodo: pick([MetodoPagamento.PIX, MetodoPagamento.CARTAO, MetodoPagamento.BOLETO]),
-              valor: valorParcela,
-              dataPagamento,
-              registradoPorId: pick(usuarios).id,
-            },
-          });
-          await prisma.timelineEntrada.create({
-            data: {
-              clienteId: cliente.id,
-              tipo: TipoEventoTimeline.PAGAMENTO_RECEBIDO,
-              descricao: `Pagamento da parcela ${p}/${parcelasCount} recebido — R$ ${valorParcela.toFixed(2)}`,
-              criadoEm: dataPagamento,
-            },
-          });
-        }
-      }
+    for (const pag of pagamentos) {
+      const dataPagamento = new Date(dataEntrada);
+      dataPagamento.setDate(dataPagamento.getDate() + pag.offset);
+      await prisma.pagamento.create({
+        data: {
+          clienteId: cliente.id,
+          tipo: pag.tipo,
+          metodo: pick([MetodoPagamento.PIX, MetodoPagamento.CARTAO, MetodoPagamento.DINHEIRO]),
+          valor: pag.valor,
+          dataPagamento,
+          registradoPorId: pick(usuarios).id,
+        },
+      });
+      await prisma.timelineEntrada.create({
+        data: {
+          clienteId: cliente.id,
+          tipo: TipoEventoTimeline.PAGAMENTO_RECEBIDO,
+          descricao: `Pagamento recebido — R$ ${pag.valor.toFixed(2)}`,
+          criadoEm: dataPagamento,
+        },
+      });
     }
 
     // Documentos
@@ -211,18 +186,9 @@ async function main() {
             clienteId: cliente.id,
             tipo,
             nomeArquivo: `${tipo.toLowerCase()}-${cliente.id.slice(0, 6)}.pdf`,
-            // Chave de storage relativa (arquivo não existe de fato no seed;
-            // o download responde 404 de forma limpa).
             url: `${cliente.id}/seed-${tipo.toLowerCase()}.pdf`,
             tamanho: faker.number.int({ min: 50_000, max: 2_000_000 }),
             enviadoPorId: pick(usuarios).id,
-          },
-        });
-        await prisma.timelineEntrada.create({
-          data: {
-            clienteId: cliente.id,
-            tipo: TipoEventoTimeline.DOCUMENTO_ENVIADO,
-            descricao: `Documento (${tipo}) enviado`,
           },
         });
       }
@@ -240,33 +206,8 @@ async function main() {
     }
   }
 
-  console.log("Criando tarefas...");
-  const clientesAmostra = await prisma.cliente.findMany({ take: 30 });
-  for (const cliente of clientesAmostra) {
-    if (faker.datatype.boolean({ probability: 0.4 })) {
-      const prazo = new Date();
-      prazo.setDate(prazo.getDate() + faker.number.int({ min: -3, max: 14 }));
-      await prisma.tarefa.create({
-        data: {
-          titulo: pick([
-            "Ligar para confirmar documentação",
-            "Enviar proposta atualizada",
-            "Cobrar parcela em atraso",
-            "Solicitar comprovante de residência",
-            "Follow-up pós diagnóstico",
-          ]),
-          clienteId: cliente.id,
-          responsavelId: pick(usuarios).id,
-          criadorId: pick(usuarios).id,
-          prioridade: pick([PrioridadeTarefa.BAIXA, PrioridadeTarefa.MEDIA, PrioridadeTarefa.ALTA]),
-          prazo,
-          concluida: faker.datatype.boolean({ probability: 0.3 }),
-        },
-      });
-    }
-  }
-
   console.log("Criando eventos de agenda...");
+  const clientesAmostra = await prisma.cliente.findMany({ take: 30 });
   for (let i = 0; i < 25; i++) {
     const inicio = new Date();
     inicio.setDate(inicio.getDate() + faker.number.int({ min: -5, max: 20 }));
@@ -283,13 +224,7 @@ async function main() {
           "Envio de documentação",
           "Reunião comercial",
         ]),
-        tipo: pick([
-          TipoEvento.LIGACAO,
-          TipoEvento.COBRANCA,
-          TipoEvento.RETORNO,
-          TipoEvento.DOCUMENTACAO,
-          TipoEvento.COMPROMISSO,
-        ]),
+        tipo: pick([TipoEvento.LIGACAO, TipoEvento.COBRANCA, TipoEvento.RETORNO, TipoEvento.DOCUMENTACAO, TipoEvento.COMPROMISSO]),
         clienteId: pick(clientesAmostra).id,
         responsavelId: pick(usuarios).id,
         inicio,
@@ -299,19 +234,15 @@ async function main() {
     });
   }
 
-  console.log("Criando lançamentos financeiros (fluxo de caixa)...");
-  for (let i = 0; i < 90; i++) {
+  console.log("Criando despesas (fluxo de caixa)...");
+  for (let i = 0; i < 40; i++) {
     const data = randomDateWithinDays(180);
-    const tipo = faker.datatype.boolean({ probability: 0.65 }) ? TipoLancamento.RECEITA : TipoLancamento.DESPESA;
     await prisma.lancamento.create({
       data: {
-        tipo,
-        categoria:
-          tipo === "RECEITA"
-            ? pick(["Contrato fechado", "Parcela recebida", "Entrada"])
-            : pick(["Tráfego pago", "Ferramentas", "Comissão", "Operacional"]),
-        descricao: tipo === "RECEITA" ? "Recebimento de cliente" : "Despesa operacional",
-        valor: faker.number.int({ min: 150, max: 4000 }),
+        tipo: TipoLancamento.DESPESA,
+        categoria: pick(["Tráfego pago", "Ferramentas", "Comissão", "Operacional"]),
+        descricao: "Despesa operacional",
+        valor: faker.number.int({ min: 150, max: 2500 }),
         data,
       },
     });

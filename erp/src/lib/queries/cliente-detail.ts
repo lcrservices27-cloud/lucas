@@ -23,10 +23,6 @@ export async function getClienteDetail(id: string) {
         orderBy: { criadoEm: "desc" },
         include: { usuario: { select: { nome: true } } },
       },
-      tarefas: {
-        orderBy: { criadoEm: "desc" },
-        include: { responsavel: { select: { nome: true } } },
-      },
       eventos: { orderBy: { inicio: "desc" } },
     },
   });

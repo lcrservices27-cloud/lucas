@@ -1,69 +1,110 @@
 import { prisma } from "@/lib/prisma";
-import { startOfMonth, startOfYear } from "date-fns";
+import { startOfMonth, startOfDay } from "date-fns";
 import { sincronizarAtrasos } from "@/lib/financeiro-sync";
+
+export type FluxoItem = {
+  id: string;
+  data: Date;
+  tipo: "RECEITA" | "DESPESA";
+  clienteId: string | null;
+  clienteNome: string | null;
+  produto: string | null;
+  descricao: string;
+  forma: string | null;
+  valor: number;
+  saldoAcumulado: number;
+};
 
 export async function getFinanceiroData() {
   await sincronizarAtrasos();
 
   const now = new Date();
   const inicioMes = startOfMonth(now);
-  const inicioAno = startOfYear(now);
+  const inicioDia = startOfDay(now);
 
-  const [lancamentos, parcelasEmAberto, pagamentosRecentes, todasParcelas] = await Promise.all([
-    prisma.lancamento.findMany({ orderBy: { data: "desc" } }),
-    prisma.parcela.findMany({
-      where: { status: { in: ["PENDENTE", "ATRASADA"] } },
-      orderBy: { vencimento: "asc" },
-      include: { cliente: { select: { id: true, nome: true } } },
-    }),
+  const [pagamentos, lancamentos, clientes, vendasFechadas, aguardandoPix] = await Promise.all([
     prisma.pagamento.findMany({
-      orderBy: { dataPagamento: "desc" },
-      take: 20,
-      include: { cliente: { select: { id: true, nome: true } }, registradoPor: { select: { nome: true } } },
+      orderBy: { dataPagamento: "asc" },
+      include: { cliente: { select: { id: true, nome: true, produto: true } } },
     }),
-    prisma.parcela.findMany({ select: { valor: true, status: true } }),
+    prisma.lancamento.findMany({ orderBy: { data: "asc" } }),
+    prisma.cliente.findMany({
+      where: { statusComercial: { not: "CANCELADO" } },
+      select: { valorContratado: true, pagamentos: { select: { valor: true } } },
+    }),
+    prisma.cliente.count({ where: { statusComercial: "VENDA_FECHADA" } }),
+    prisma.cliente.count({ where: { statusComercial: "AGUARDANDO_PIX" } }),
   ]);
 
-  const receitasTotais = lancamentos.filter((l) => l.tipo === "RECEITA").reduce((a, l) => a + Number(l.valor), 0);
-  const despesasTotais = lancamentos.filter((l) => l.tipo === "DESPESA").reduce((a, l) => a + Number(l.valor), 0);
+  // Ledger unificado: pagamentos (entradas de clientes) + lançamentos manuais.
+  type Raw = {
+    id: string;
+    data: Date;
+    tipo: "RECEITA" | "DESPESA";
+    clienteId: string | null;
+    clienteNome: string | null;
+    produto: string | null;
+    descricao: string;
+    forma: string | null;
+    valor: number;
+  };
 
-  const receitasMes = lancamentos
-    .filter((l) => l.tipo === "RECEITA" && l.data >= inicioMes)
-    .reduce((a, l) => a + Number(l.valor), 0);
-  const despesasMes = lancamentos
-    .filter((l) => l.tipo === "DESPESA" && l.data >= inicioMes)
-    .reduce((a, l) => a + Number(l.valor), 0);
+  const raw: Raw[] = [
+    ...pagamentos.map((p) => ({
+      id: `pg-${p.id}`,
+      data: p.dataPagamento,
+      tipo: "RECEITA" as const,
+      clienteId: p.cliente.id,
+      clienteNome: p.cliente.nome,
+      produto: p.cliente.produto,
+      descricao: `Pagamento de ${p.cliente.nome}`,
+      forma: p.metodo,
+      valor: Number(p.valor),
+    })),
+    ...lancamentos.map((l) => ({
+      id: `lc-${l.id}`,
+      data: l.data,
+      tipo: l.tipo as "RECEITA" | "DESPESA",
+      clienteId: null,
+      clienteNome: null,
+      produto: null,
+      descricao: l.descricao || l.categoria,
+      forma: null,
+      valor: Number(l.valor),
+    })),
+  ].sort((a, b) => a.data.getTime() - b.data.getTime());
 
-  const receitasAno = lancamentos
-    .filter((l) => l.tipo === "RECEITA" && l.data >= inicioAno)
-    .reduce((a, l) => a + Number(l.valor), 0);
-  const despesasAno = lancamentos
-    .filter((l) => l.tipo === "DESPESA" && l.data >= inicioAno)
-    .reduce((a, l) => a + Number(l.valor), 0);
+  // Saldo acumulado em ordem cronológica.
+  let acumulado = 0;
+  const fluxoAsc: FluxoItem[] = raw.map((r) => {
+    acumulado += r.tipo === "RECEITA" ? r.valor : -r.valor;
+    return { ...r, saldoAcumulado: acumulado };
+  });
+  const fluxo = [...fluxoAsc].reverse(); // mais recentes primeiro para exibição
 
-  const contasAReceber = parcelasEmAberto.reduce((a, p) => a + Number(p.valor), 0);
-  const totalEmParcelas = todasParcelas.reduce((a, p) => a + Number(p.valor), 0);
-  const totalParcelasPagas = todasParcelas
-    .filter((p) => p.status === "PAGA")
-    .reduce((a, p) => a + Number(p.valor), 0);
+  const saldoAcumulado = acumulado;
+  const saldoDoDia = raw
+    .filter((r) => r.data >= inicioDia)
+    .reduce((acc, r) => acc + (r.tipo === "RECEITA" ? r.valor : -r.valor), 0);
+  const totalRecebidoMes = raw
+    .filter((r) => r.tipo === "RECEITA" && r.data >= inicioMes)
+    .reduce((acc, r) => acc + r.valor, 0);
+
+  const totalPendente = clientes.reduce((acc, c) => {
+    const total = Number(c.valorContratado);
+    const pago = c.pagamentos.reduce((s, p) => s + Number(p.valor), 0);
+    return acc + Math.max(0, total - pago);
+  }, 0);
 
   return {
     kpis: {
-      receitasTotais,
-      despesasTotais,
-      lucro: receitasTotais - despesasTotais,
-      saldo: receitasTotais - despesasTotais,
-      receitasMes,
-      despesasMes,
-      lucroMes: receitasMes - despesasMes,
-      receitasAno,
-      despesasAno,
-      contasAReceber,
-      totalEmParcelas,
-      totalParcelasPagas,
+      saldoDoDia,
+      saldoAcumulado,
+      totalRecebidoMes,
+      totalPendente,
+      vendasFechadas,
+      aguardandoPix,
     },
-    lancamentos: lancamentos.slice(0, 40).map((l) => ({ ...l, valor: Number(l.valor) })),
-    parcelasEmAberto: parcelasEmAberto.map((p) => ({ ...p, valor: Number(p.valor) })),
-    pagamentosRecentes: pagamentosRecentes.map((p) => ({ ...p, valor: Number(p.valor) })),
+    fluxo,
   };
 }

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { User, LayoutDashboard, KanbanSquare, Wallet, CalendarDays, ListChecks } from "lucide-react";
+import { User, LayoutDashboard, KanbanSquare, Wallet, CalendarDays } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -20,7 +20,6 @@ const ATALHOS = [
   { title: "Kanban Comercial", href: "/comercial", icon: KanbanSquare },
   { title: "Financeiro", href: "/financeiro", icon: Wallet },
   { title: "Agenda", href: "/agenda", icon: CalendarDays },
-  { title: "Tarefas", href: "/tarefas", icon: ListChecks },
 ];
 
 export function CommandPalette() {

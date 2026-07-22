@@ -36,13 +36,8 @@ export default async function DashboardPage() {
         <p className="text-sm text-muted-foreground">Visão geral da operação em tempo real.</p>
       </div>
 
-      {(alertas.tarefasVencidas > 0 || alertas.clientesParados > 0 || alertas.parcelasAtrasadas > 0) && (
+      {(alertas.clientesParados > 0 || alertas.parcelasAtrasadas > 0) && (
         <div className="flex flex-wrap gap-2">
-          {alertas.tarefasVencidas > 0 && (
-            <Badge variant="destructive" className="gap-1.5 py-1">
-              <AlertTriangle className="size-3" /> {alertas.tarefasVencidas} tarefa(s) vencida(s)
-            </Badge>
-          )}
           {alertas.parcelasAtrasadas > 0 && (
             <Badge variant="destructive" className="gap-1.5 py-1">
               <AlertTriangle className="size-3" /> {alertas.parcelasAtrasadas} parcela(s) atrasada(s)

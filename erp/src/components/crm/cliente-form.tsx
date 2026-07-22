@@ -16,7 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { clienteSchema, type ClienteFormValues, ESTADOS_BR } from "@/lib/validators/cliente";
-import { FORMA_PAGAMENTO_LABEL } from "@/lib/labels";
+import { FORMA_PAGAMENTO_LABEL, PRODUTO_LABEL } from "@/lib/labels";
+import { formatCurrency } from "@/lib/utils";
 
 type Usuario = { id: string; nome: string };
 
@@ -45,14 +46,20 @@ export function ClienteForm({
       endereco: "",
       origemLead: "",
       responsavelId: "",
+      produto: undefined,
       valorContratado: 0,
-      formaPagamento: "",
+      valorPago: 0,
+      formaPagamento: undefined,
       numeroParcelas: undefined,
+      dataEntrada: new Date().toISOString().slice(0, 10),
       ...defaultValues,
     },
   });
 
   const [pending, setPending] = React.useState(false);
+  const valorTotal = Number(form.watch("valorContratado")) || 0;
+  const valorPago = Number(form.watch("valorPago")) || 0;
+  const valorRestante = Math.max(0, valorTotal - valorPago);
 
   async function handleSubmit(values: ClienteFormValues) {
     setPending(true);
@@ -83,8 +90,32 @@ export function ClienteForm({
           )}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="cpf">CPF</Label>
+          <Label htmlFor="cpf">CPF *</Label>
           <Input id="cpf" {...form.register("cpf")} placeholder="000.000.000-00" />
+          {form.formState.errors.cpf && (
+            <p className="text-xs text-destructive">{form.formState.errors.cpf.message}</p>
+          )}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="produto">Produto contratado *</Label>
+          <Select
+            value={form.watch("produto") || undefined}
+            onValueChange={(v) => form.setValue("produto", v as ClienteFormValues["produto"], { shouldValidate: true })}
+          >
+            <SelectTrigger id="produto" className="w-full">
+              <SelectValue placeholder="Selecionar" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(PRODUTO_LABEL).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {form.formState.errors.produto && (
+            <p className="text-xs text-destructive">{form.formState.errors.produto.message}</p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="rg">RG</Label>
@@ -153,15 +184,38 @@ export function ClienteForm({
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="valorContratado">Valor contratado (R$)</Label>
-          <Input id="valorContratado" type="number" step="0.01" min={0} {...form.register("valorContratado")} />
+        <div className="col-span-full mt-1 border-t pt-3">
+          <p className="text-sm font-semibold text-muted-foreground">Serviço e pagamento</p>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="formaPagamento">Forma de pagamento</Label>
+          <Label htmlFor="valorContratado">Valor total do serviço (R$) *</Label>
+          <Input id="valorContratado" type="number" step="0.01" min={0} {...form.register("valorContratado")} />
+          {form.formState.errors.valorContratado && (
+            <p className="text-xs text-destructive">{form.formState.errors.valorContratado.message}</p>
+          )}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="valorPago">Valor pago / entrada (R$)</Label>
+          <Input id="valorPago" type="number" step="0.01" min={0} {...form.register("valorPago")} />
+          {form.formState.errors.valorPago && (
+            <p className="text-xs text-destructive">{form.formState.errors.valorPago.message}</p>
+          )}
+        </div>
+        <div className="space-y-1.5">
+          <Label>Valor restante</Label>
+          <div className="flex h-9 items-center rounded-md border bg-muted/40 px-3 text-sm font-semibold tabular-nums">
+            {formatCurrency(valorRestante)}
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="dataEntrada">Data da entrada *</Label>
+          <Input id="dataEntrada" type="date" {...form.register("dataEntrada")} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="formaPagamento">Forma de pagamento *</Label>
           <Select
             value={form.watch("formaPagamento") || undefined}
-            onValueChange={(v) => form.setValue("formaPagamento", v as ClienteFormValues["formaPagamento"])}
+            onValueChange={(v) => form.setValue("formaPagamento", v as ClienteFormValues["formaPagamento"], { shouldValidate: true })}
           >
             <SelectTrigger id="formaPagamento" className="w-full">
               <SelectValue placeholder="Selecionar" />
@@ -174,9 +228,12 @@ export function ClienteForm({
               ))}
             </SelectContent>
           </Select>
+          {form.formState.errors.formaPagamento && (
+            <p className="text-xs text-destructive">{form.formState.errors.formaPagamento.message}</p>
+          )}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="numeroParcelas">Nº de parcelas</Label>
+          <Label htmlFor="numeroParcelas">Qtd. de parcelas</Label>
           <Input id="numeroParcelas" type="number" min={1} max={60} {...form.register("numeroParcelas")} />
         </div>
       </div>

@@ -1,126 +1,66 @@
 import { prisma } from "@/lib/prisma";
-import { startOfMonth, subMonths, format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { sincronizarAtrasos } from "@/lib/financeiro-sync";
 
-export async function getRelatoriosData() {
-  const now = new Date();
-  const seisMesesAtras = startOfMonth(subMonths(now, 5));
+export type RelatorioLinha = {
+  id: string;
+  nome: string;
+  cpf: string | null;
+  produto: string | null;
+  dataEntrada: string; // ISO
+  valorTotal: number;
+  valorPago: number;
+  valorRestante: number;
+  formaPagamento: string | null;
+  statusComercial: string;
+  statusFinanceiro: string;
+  datasPagamentos: string[]; // ISO
+  dataConclusao: string | null; // ISO — quando virou Venda Fechada
+  observacoes: string;
+};
 
-  const [
-    totalClientes,
-    clientesPorStatusComercial,
-    clientesCidadeEstado,
-    clientesOrigem,
-    clientesResponsavel,
-    pagamentosSeisMeses,
-    todosPagamentos,
-    parcelasEmAberto,
-    pagamentosRecentes,
-  ] = await Promise.all([
-    prisma.cliente.count(),
-    prisma.cliente.groupBy({ by: ["statusComercial"], _count: true }),
-    prisma.cliente.findMany({ select: { cidade: true, estado: true } }),
-    prisma.cliente.groupBy({ by: ["origemLead"], _count: true }),
-    prisma.cliente.findMany({
-      select: {
-        valorContratado: true,
-        responsavel: { select: { id: true, nome: true } },
-      },
-    }),
-    prisma.pagamento.findMany({
-      where: { dataPagamento: { gte: seisMesesAtras } },
-      select: { valor: true, dataPagamento: true },
-    }),
-    prisma.pagamento.aggregate({ _sum: { valor: true } }),
-    prisma.parcela.findMany({
-      where: { status: { in: ["PENDENTE", "ATRASADA"] } },
-      select: { valor: true },
-    }),
-    prisma.pagamento.findMany({
-      orderBy: { dataPagamento: "desc" },
-      take: 50,
-      include: { cliente: { select: { id: true, nome: true } } },
-    }),
-  ]);
+export async function getRelatoriosData(): Promise<{ linhas: RelatorioLinha[] }> {
+  await sincronizarAtrasos();
 
-  // Clientes por status comercial
-  const porStatusComercial = clientesPorStatusComercial.map((g) => ({
-    status: g.statusComercial as string,
-    count: g._count,
-  }));
-
-  // Clientes por cidade (top 10)
-  const cidadeCounts = new Map<string, number>();
-  for (const c of clientesCidadeEstado) {
-    const cidade = c.cidade?.trim() || "Não informado";
-    const key = c.estado ? `${cidade}/${c.estado}` : cidade;
-    cidadeCounts.set(key, (cidadeCounts.get(key) ?? 0) + 1);
-  }
-  const porCidade = Array.from(cidadeCounts.entries())
-    .map(([cidade, count]) => ({ cidade, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
-
-  // Clientes por origem de lead
-  const porOrigem = clientesOrigem
-    .map((g) => ({ origem: g.origemLead ?? "Não informado", count: g._count }))
-    .sort((a, b) => b.count - a.count);
-
-  // Clientes por responsável
-  const responsavelMap = new Map<string, { nome: string; count: number; total: number }>();
-  for (const c of clientesResponsavel) {
-    const nome = c.responsavel?.nome ?? "Sem responsável";
-    const entry = responsavelMap.get(nome) ?? { nome, count: 0, total: 0 };
-    entry.count += 1;
-    entry.total += Number(c.valorContratado);
-    responsavelMap.set(nome, entry);
-  }
-  const porResponsavel = Array.from(responsavelMap.values()).sort((a, b) => b.total - a.total);
-
-  // Receita
-  const totalReceita = Number(todosPagamentos._sum.valor ?? 0);
-  const totalAReceber = parcelasEmAberto.reduce((acc, p) => acc + Number(p.valor), 0);
-
-  const meses = Array.from({ length: 6 }).map((_, i) => startOfMonth(subMonths(now, 5 - i)));
-  const receitaMensal = meses.map((mesInicio) => {
-    const mesFim = startOfMonth(subMonths(mesInicio, -1));
-    const total = pagamentosSeisMeses
-      .filter((p) => p.dataPagamento >= mesInicio && p.dataPagamento < mesFim)
-      .reduce((acc, p) => acc + Number(p.valor), 0);
-    return { mes: format(mesInicio, "MMM", { locale: ptBR }), total };
+  const clientes = await prisma.cliente.findMany({
+    orderBy: { dataEntrada: "desc" },
+    select: {
+      id: true,
+      nome: true,
+      cpf: true,
+      produto: true,
+      dataEntrada: true,
+      atualizadoEm: true,
+      valorContratado: true,
+      formaPagamento: true,
+      statusComercial: true,
+      statusFinanceiro: true,
+      pagamentos: { orderBy: { dataPagamento: "asc" }, select: { valor: true, dataPagamento: true } },
+      observacoes: { orderBy: { criadoEm: "desc" }, select: { conteudo: true } },
+    },
   });
 
-  // Conversão
-  const vendasFechadas = porStatusComercial.find((s) => s.status === "VENDA_FECHADA")?.count ?? 0;
-  const conversao = totalClientes > 0 ? (vendasFechadas / totalClientes) * 100 : 0;
+  const linhas: RelatorioLinha[] = clientes.map((c) => {
+    const total = Number(c.valorContratado);
+    const pago = c.pagamentos.reduce((s, p) => s + Number(p.valor), 0);
+    const ultimoPagamento = c.pagamentos.at(-1)?.dataPagamento ?? null;
+    const concluido = c.statusComercial === "VENDA_FECHADA";
+    return {
+      id: c.id,
+      nome: c.nome,
+      cpf: c.cpf,
+      produto: c.produto,
+      dataEntrada: c.dataEntrada.toISOString(),
+      valorTotal: total,
+      valorPago: pago,
+      valorRestante: Math.max(0, total - pago),
+      formaPagamento: c.formaPagamento,
+      statusComercial: c.statusComercial,
+      statusFinanceiro: c.statusFinanceiro,
+      datasPagamentos: c.pagamentos.map((p) => p.dataPagamento.toISOString()),
+      dataConclusao: concluido ? (ultimoPagamento ?? c.atualizadoEm).toISOString() : null,
+      observacoes: c.observacoes.map((o) => o.conteudo).join(" | "),
+    };
+  });
 
-  // Pagamentos (últimos ~50)
-  const pagamentos = pagamentosRecentes.map((p) => ({
-    id: p.id,
-    clienteId: p.cliente.id,
-    clienteNome: p.cliente.nome,
-    tipo: p.tipo as string,
-    metodo: p.metodo as string,
-    valor: Number(p.valor),
-    dataPagamento: p.dataPagamento,
-  }));
-
-  return {
-    clientes: {
-      total: totalClientes,
-      porStatusComercial,
-      porCidade,
-      porOrigem,
-      porResponsavel,
-      conversao,
-    },
-    financeiro: {
-      totalReceita,
-      totalAReceber,
-      receitaMensal,
-    },
-    pagamentos,
-  };
+  return { linhas };
 }
-
-export type RelatoriosData = Awaited<ReturnType<typeof getRelatoriosData>>;

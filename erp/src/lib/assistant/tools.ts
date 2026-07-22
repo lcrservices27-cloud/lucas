@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { logTimeline } from "@/lib/actions/timeline";
 import { registrarPagamento } from "@/lib/actions/pagamentos";
 import { moveClienteComercial } from "@/lib/actions/clientes";
-import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { normalizar } from "@/lib/assistant/normalize";
+import { calcularStatusCliente } from "@/lib/status-cliente";
 import { STATUS_COMERCIAL_LABEL } from "@/lib/labels";
 import type { AssistenteDraftCliente, AssistenteUiAction, ListaItem } from "@/lib/assistant/types";
 
@@ -52,7 +53,8 @@ export async function criarClienteAssistente(draft: AssistenteDraftCliente) {
   const valorContratado = draft.valorContratado ?? 0;
   const valorEntrada = draft.valorEntrada ?? 0;
 
-  const statusComercial = valorContratado <= 0 ? "NOVO_LEAD" : valorEntrada > 0 ? "ENTRADA_RECEBIDA" : "VENDA_FECHADA";
+  const pagoInicial = Math.min(valorEntrada, valorContratado);
+  const { comercial, financeiro } = calcularStatusCliente(valorContratado, pagoInicial);
   const formaPagamento = valorEntrada > 0 && valorEntrada < valorContratado ? "ENTRADA_MAIS_PARCELAS" : valorContratado > 0 ? "A_VISTA" : null;
 
   const cliente = await prisma.cliente.create({
@@ -64,7 +66,8 @@ export async function criarClienteAssistente(draft: AssistenteDraftCliente) {
       cidade: draft.cidade || null,
       origemLead: "Assistente de voz",
       valorContratado,
-      statusComercial,
+      statusComercial: comercial,
+      statusFinanceiro: financeiro,
       formaPagamento,
     },
   });
@@ -228,42 +231,4 @@ export async function responderPerguntaFinanceira(pergunta: string): Promise<str
   ]);
 
   return `Valor pendente a receber: ${formatCurrency(Number(pendentes._sum.valor ?? 0))}. Valor total contratado na base: ${formatCurrency(Number(contratado._sum.valorContratado ?? 0))}.`;
-}
-
-export async function criarTarefaAssistente(
-  usuarioId: string,
-  titulo: string,
-  clienteId: string | null,
-  quando: Date
-) {
-  const tarefa = await prisma.tarefa.create({
-    data: {
-      titulo,
-      clienteId,
-      responsavelId: usuarioId,
-      criadorId: usuarioId,
-      prioridade: "MEDIA",
-      prazo: quando,
-    },
-  });
-
-  const evento = await prisma.evento.create({
-    data: {
-      titulo,
-      tipo: "LIGACAO",
-      clienteId,
-      responsavelId: usuarioId,
-      inicio: quando,
-    },
-  });
-
-  if (clienteId) {
-    await logTimeline(clienteId, "TAREFA_CRIADA", `Tarefa criada via assistente: ${titulo}`, usuarioId);
-  }
-
-  return { tarefaId: tarefa.id, eventoId: evento.id, quando };
-}
-
-export function formatarQuando(data: Date): string {
-  return formatDateTime(data);
 }

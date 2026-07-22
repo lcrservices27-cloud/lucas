@@ -21,7 +21,6 @@ export async function getDashboardData() {
     lancamentos,
     clientesRecentes,
     timelineRecente,
-    tarefasVencidas,
     clientesParados,
     vendasFechadas,
   ] = await Promise.all([
@@ -49,7 +48,6 @@ export async function getDashboardData() {
       orderBy: { criadoEm: "desc" },
       include: { cliente: { select: { nome: true } }, usuario: { select: { nome: true } } },
     }),
-    prisma.tarefa.count({ where: { concluida: false, prazo: { lt: now } } }),
     prisma.cliente.count({
       where: {
         statusComercial: { notIn: ["VENDA_FECHADA", "CANCELADO"] satisfies StatusComercial[] },
@@ -143,7 +141,6 @@ export async function getDashboardData() {
     charts: { receitaMensal, clientesPorMes, fluxoCaixa, statusComercial },
     timelineRecente,
     alertas: {
-      tarefasVencidas,
       clientesParados,
       parcelasAtrasadas: parcelasPendentes.filter((p) => p.status === "ATRASADA").length,
     },

@@ -67,7 +67,6 @@ export function UsuarioRow({ usuario, isSelf }: { usuario: UsuarioItem; isSelf: 
         </Select>
       </TableCell>
       <TableCell className="text-sm">{usuario._count.clientesResponsavel} clientes</TableCell>
-      <TableCell className="text-sm">{usuario._count.tarefasResponsavel} tarefas</TableCell>
       <TableCell className="text-sm text-muted-foreground">{formatDate(usuario.criadoEm)}</TableCell>
       <TableCell>
         <Switch checked={usuario.ativo} onCheckedChange={handleToggleAtivo} disabled={pending || isSelf} />
