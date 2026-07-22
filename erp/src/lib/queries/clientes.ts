@@ -21,7 +21,6 @@ export async function getClientesList() {
     responsavel: c.responsavel?.nome ?? null,
     dataEntrada: c.dataEntrada,
     statusComercial: c.statusComercial,
-    statusJuridico: c.statusJuridico,
     statusFinanceiro: c.statusFinanceiro,
     valorContratado: Number(c.valorContratado),
   }));

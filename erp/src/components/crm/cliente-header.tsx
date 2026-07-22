@@ -16,7 +16,7 @@ import {
 import { ClienteForm } from "@/components/crm/cliente-form";
 import { updateCliente } from "@/lib/actions/clientes";
 import type { ClienteFormValues } from "@/lib/validators/cliente";
-import { STATUS_COMERCIAL_LABEL, STATUS_JURIDICO_LABEL, STATUS_FINANCEIRO_LABEL, STATUS_FINANCEIRO_BADGE } from "@/lib/labels";
+import { STATUS_COMERCIAL_LABEL, STATUS_FINANCEIRO_LABEL, STATUS_FINANCEIRO_BADGE } from "@/lib/labels";
 import { formatCurrency, formatDate, initials } from "@/lib/utils";
 import type { ClienteDetail } from "@/lib/queries/cliente-detail";
 
@@ -54,7 +54,6 @@ export function ClienteHeader({
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <Badge variant="outline">{STATUS_COMERCIAL_LABEL[cliente.statusComercial]}</Badge>
-            <Badge variant="outline">{STATUS_JURIDICO_LABEL[cliente.statusJuridico]}</Badge>
             <Badge variant={STATUS_FINANCEIRO_BADGE[cliente.statusFinanceiro]}>
               {STATUS_FINANCEIRO_LABEL[cliente.statusFinanceiro]}
             </Badge>

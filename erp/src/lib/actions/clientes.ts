@@ -6,13 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser, assertUser } from "@/lib/auth";
 import { clienteSchema } from "@/lib/validators/cliente";
 import { logTimeline } from "@/lib/actions/timeline";
-import {
-  STATUS_COMERCIAL_ORDER,
-  STATUS_COMERCIAL_LABEL,
-  STATUS_JURIDICO_ORDER,
-  STATUS_JURIDICO_LABEL,
-} from "@/lib/labels";
-import type { StatusComercial, StatusJuridico } from "@/generated/prisma/enums";
+import { STATUS_COMERCIAL_ORDER, STATUS_COMERCIAL_LABEL } from "@/lib/labels";
+import type { StatusComercial } from "@/generated/prisma/enums";
 
 export type FormState = {
   error?: string;
@@ -118,30 +113,6 @@ export async function updateStatusComercial(clienteId: string, statusComercial: 
   return cliente;
 }
 
-export async function updateStatusJuridico(clienteId: string, statusJuridico: string) {
-  const usuario = await assertUser();
-  if (!STATUS_JURIDICO_ORDER.includes(statusJuridico)) {
-    throw new Error(`Status jurídico inválido: ${statusJuridico}`);
-  }
-  const cliente = await prisma.cliente.update({
-    where: { id: clienteId },
-    data: { statusJuridico: statusJuridico as StatusJuridico },
-  });
-  await logTimeline(
-    clienteId,
-    "STATUS_ALTERADO",
-    `Status jurídico alterado para "${STATUS_JURIDICO_LABEL[statusJuridico]}"`,
-    usuario.id
-  );
-  revalidatePath("/juridico");
-  revalidatePath(`/crm/${clienteId}`);
-  return cliente;
-}
-
 export async function moveClienteComercial(clienteId: string, statusComercial: string): Promise<void> {
   await updateStatusComercial(clienteId, statusComercial);
-}
-
-export async function moveClienteJuridico(clienteId: string, statusJuridico: string): Promise<void> {
-  await updateStatusJuridico(clienteId, statusJuridico);
 }

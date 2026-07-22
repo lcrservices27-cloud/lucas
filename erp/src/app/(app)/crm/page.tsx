@@ -5,9 +5,9 @@ import { NovoClienteSheet } from "@/components/crm/novo-cliente-sheet";
 export default async function CrmPage({
   searchParams,
 }: {
-  searchParams: Promise<{ statusFinanceiro?: string; statusJuridico?: string }>;
+  searchParams: Promise<{ statusFinanceiro?: string }>;
 }) {
-  const [{ statusFinanceiro, statusJuridico }, clientes, usuarios] = await Promise.all([
+  const [{ statusFinanceiro }, clientes, usuarios] = await Promise.all([
     searchParams,
     getClientesList(),
     getUsuariosAtivos(),
@@ -23,11 +23,7 @@ export default async function CrmPage({
         <NovoClienteSheet usuarios={usuarios} />
       </div>
 
-      <ClientesTable
-        data={clientes}
-        initialStatusFinanceiro={statusFinanceiro}
-        initialStatusJuridico={statusJuridico}
-      />
+      <ClientesTable data={clientes} initialStatusFinanceiro={statusFinanceiro} />
     </div>
   );
 }

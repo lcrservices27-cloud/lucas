@@ -14,7 +14,7 @@ import {
   Cell,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { STATUS_JURIDICO_LABEL, STATUS_JURIDICO_ORDER } from "@/lib/labels";
+import { STATUS_COMERCIAL_LABEL, STATUS_COMERCIAL_ORDER } from "@/lib/labels";
 
 const axisStyle = { fontSize: 12, fill: "var(--muted-foreground)" };
 
@@ -113,10 +113,10 @@ export function FluxoCaixaChart({
   );
 }
 
-export function StatusProcessosChart({ data }: { data: { status: string; count: number }[] }) {
-  const ordered = STATUS_JURIDICO_ORDER.filter((s) => s !== "CANCELADO").map((status) => ({
+export function StatusComercialChart({ data }: { data: { status: string; count: number }[] }) {
+  const ordered = STATUS_COMERCIAL_ORDER.filter((s) => s !== "CANCELADO").map((status) => ({
     status,
-    label: STATUS_JURIDICO_LABEL[status],
+    label: STATUS_COMERCIAL_LABEL[status],
     count: data.find((d) => d.status === status)?.count ?? 0,
   }));
 

@@ -29,8 +29,6 @@ import type { ClienteListItem } from "@/lib/queries/clientes";
 import {
   STATUS_COMERCIAL_LABEL,
   STATUS_COMERCIAL_ORDER,
-  STATUS_JURIDICO_LABEL,
-  STATUS_JURIDICO_ORDER,
   STATUS_FINANCEIRO_LABEL,
   STATUS_FINANCEIRO_BADGE,
   STATUS_FINANCEIRO_ORDER,
@@ -83,12 +81,6 @@ const columns: ColumnDef<ClienteListItem>[] = [
     filterFn: (row, id, value) => value === "all" || row.getValue(id) === value,
   },
   {
-    accessorKey: "statusJuridico",
-    header: "Jurídico",
-    cell: ({ row }) => <Badge variant="outline">{STATUS_JURIDICO_LABEL[row.original.statusJuridico]}</Badge>,
-    filterFn: (row, id, value) => value === "all" || row.getValue(id) === value,
-  },
-  {
     accessorKey: "statusFinanceiro",
     header: "Financeiro",
     cell: ({ row }) => (
@@ -126,16 +118,13 @@ const columns: ColumnDef<ClienteListItem>[] = [
 export function ClientesTable({
   data,
   initialStatusFinanceiro,
-  initialStatusJuridico,
 }: {
   data: ClienteListItem[];
   initialStatusFinanceiro?: string;
-  initialStatusJuridico?: string;
 }) {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([{ id: "dataEntrada", desc: true }]);
   const [statusComercial, setStatusComercial] = React.useState("all");
-  const [statusJuridico, setStatusJuridico] = React.useState(initialStatusJuridico || "all");
   const [statusFinanceiro, setStatusFinanceiro] = React.useState(initialStatusFinanceiro || "all");
 
   const table = useReactTable({
@@ -163,10 +152,6 @@ export function ClientesTable({
   }, [statusComercial, table]);
 
   React.useEffect(() => {
-    table.getColumn("statusJuridico")?.setFilterValue(statusJuridico);
-  }, [statusJuridico, table]);
-
-  React.useEffect(() => {
     table.getColumn("statusFinanceiro")?.setFilterValue(statusFinanceiro);
   }, [statusFinanceiro, table]);
 
@@ -191,19 +176,6 @@ export function ClientesTable({
             {STATUS_COMERCIAL_ORDER.map((s) => (
               <SelectItem key={s} value={s}>
                 {STATUS_COMERCIAL_LABEL[s]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={statusJuridico} onValueChange={setStatusJuridico}>
-          <SelectTrigger className="w-[190px]">
-            <SelectValue placeholder="Status jurídico" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todo status jurídico</SelectItem>
-            {STATUS_JURIDICO_ORDER.map((s) => (
-              <SelectItem key={s} value={s}>
-                {STATUS_JURIDICO_LABEL[s]}
               </SelectItem>
             ))}
           </SelectContent>

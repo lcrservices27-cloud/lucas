@@ -5,7 +5,6 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import {
   StatusComercial,
-  StatusJuridico,
   StatusFinanceiro,
   FormaPagamento,
   StatusParcela,
@@ -76,7 +75,6 @@ async function main() {
   );
 
   const statusComercialList = Object.values(StatusComercial);
-  const statusJuridicoList = Object.values(StatusJuridico);
 
   console.log("Criando clientes...");
   const totalClientes = 60;
@@ -88,7 +86,6 @@ async function main() {
     const statusComercial = pick(statusComercialList);
     const isVendaFechada =
       statusComercial === "VENDA_FECHADA" || statusComercial === "ENTRADA_RECEBIDA";
-    const statusJuridico = isVendaFechada ? pick(statusJuridicoList) : "AGUARDANDO_DOCUMENTOS";
 
     const valorContratado = isVendaFechada
       ? faker.number.int({ min: 1500, max: 8000 })
@@ -130,7 +127,6 @@ async function main() {
         responsavelId: pick(usuarios).id,
         dataEntrada,
         statusComercial,
-        statusJuridico,
         statusFinanceiro,
         valorContratado,
         formaPagamento,

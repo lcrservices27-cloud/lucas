@@ -3,9 +3,6 @@ import {
   UserCheck,
   UserX,
   Clock,
-  FileWarning,
-  Send,
-  Loader,
   CheckCircle2,
   Wallet,
   TrendingUp,
@@ -22,7 +19,7 @@ import {
   ReceitaMensalChart,
   ClientesPorMesChart,
   FluxoCaixaChart,
-  StatusProcessosChart,
+  StatusComercialChart,
 } from "@/components/dashboard/charts";
 import { getDashboardData } from "@/lib/queries/dashboard";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
@@ -62,7 +59,7 @@ export default async function DashboardPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Clientes cadastrados" value={String(cards.totalClientes)} icon={Users} />
         <KpiCard label="Clientes ativos" value={String(cards.clientesAtivos)} icon={UserCheck} tone="success" />
-        <KpiCard label="Clientes concluídos" value={String(cards.clientesConcluidos)} icon={CheckCircle2} />
+        <KpiCard label="Vendas fechadas" value={String(cards.vendasFechadas)} icon={CheckCircle2} tone="success" />
         <KpiCard
           label="Aguardando pagamento"
           value={String(cards.clientesAguardandoPagamento)}
@@ -75,14 +72,6 @@ export default async function DashboardPage() {
           icon={UserX}
           tone="destructive"
         />
-        <KpiCard
-          label="Aguardando documentação"
-          value={String(cards.clientesAguardandoDocumentacao)}
-          icon={FileWarning}
-        />
-        <KpiCard label="Processos enviados" value={String(cards.processosEnviados)} icon={Send} />
-        <KpiCard label="Processos em andamento" value={String(cards.processosEmAndamento)} icon={Loader} />
-        <KpiCard label="Processos finalizados" value={String(cards.processosFinalizados)} icon={CheckCircle2} tone="success" />
         <KpiCard label="Receita do mês" value={formatCurrency(cards.receitaMes)} icon={TrendingUp} tone="success" />
         <KpiCard label="Receita do ano" value={formatCurrency(cards.receitaAno)} icon={Wallet} />
         <KpiCard label="Valor recebido" value={formatCurrency(cards.valorRecebido)} icon={Banknote} tone="success" />
@@ -90,8 +79,8 @@ export default async function DashboardPage() {
         <KpiCard label="Ticket médio" value={formatCurrency(cards.ticketMedio)} icon={Wallet} />
         <KpiCard label="Conversão de vendas" value={`${cards.conversaoVendas.toFixed(1)}%`} icon={Percent} />
         <KpiCard
-          label="Tempo médio do processo"
-          value={`${Math.round(cards.tempoMedioProcesso)} dias`}
+          label="Tempo médio de fechamento"
+          value={`${Math.round(cards.tempoMedioFechamento)} dias`}
           icon={Timer}
         />
       </div>
@@ -115,10 +104,10 @@ export default async function DashboardPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Status dos processos</CardTitle>
+            <CardTitle className="text-sm font-medium">Status comercial</CardTitle>
           </CardHeader>
           <CardContent>
-            <StatusProcessosChart data={charts.statusProcessos} />
+            <StatusComercialChart data={charts.statusComercial} />
           </CardContent>
         </Card>
         <Card>

@@ -18,34 +18,6 @@ export const STATUS_COMERCIAL_ORDER = [
   "CANCELADO",
 ];
 
-export const STATUS_JURIDICO_LABEL: Record<string, string> = {
-  AGUARDANDO_DOCUMENTOS: "Aguardando documentos",
-  DOCUMENTOS_RECEBIDOS: "Documentos recebidos",
-  AGUARDANDO_ENVIO: "Aguardando envio",
-  ENVIADO_AO_PARCEIRO: "Enviado ao parceiro",
-  EM_ANALISE: "Em análise",
-  PROCESSO_PROTOCOLADO: "Processo protocolado",
-  AGUARDANDO_DECISAO: "Aguardando decisão",
-  CONCLUIDO: "Concluído",
-  AGUARDANDO_PAGAMENTO_FINAL: "Aguardando pagamento final",
-  FINALIZADO: "Finalizado",
-  CANCELADO: "Cancelado",
-};
-
-export const STATUS_JURIDICO_ORDER = [
-  "AGUARDANDO_DOCUMENTOS",
-  "DOCUMENTOS_RECEBIDOS",
-  "AGUARDANDO_ENVIO",
-  "ENVIADO_AO_PARCEIRO",
-  "EM_ANALISE",
-  "PROCESSO_PROTOCOLADO",
-  "AGUARDANDO_DECISAO",
-  "CONCLUIDO",
-  "AGUARDANDO_PAGAMENTO_FINAL",
-  "FINALIZADO",
-  "CANCELADO",
-];
-
 export const STATUS_FINANCEIRO_LABEL: Record<string, string> = {
   NAO_INICIADO: "Não iniciado",
   ENTRADA_PAGA: "Entrada paga",

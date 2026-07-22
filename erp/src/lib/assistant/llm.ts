@@ -64,7 +64,7 @@ const TOOLS: Anthropic.Tool[] = [
   },
   {
     name: "mover_cliente_kanban",
-    description: "Move um cliente para outra etapa do funil comercial ou jurídico.",
+    description: "Move um cliente para outra etapa do funil comercial.",
     input_schema: {
       type: "object",
       properties: {
@@ -289,9 +289,9 @@ async function executarFerramenta(
       if (!resultado) return erroGenerico(`Não reconheci o status "${statusAlvo}".`);
 
       return {
-        fala: `${cliente.nome} foi movido no kanban ${resultado.tipo === "comercial" ? "comercial" : "jurídico"} para "${statusAlvo}". Timeline atualizada.`,
+        fala: `${cliente.nome} foi movido no kanban comercial para "${statusAlvo}". Timeline atualizada.`,
         contexto: { modo: "idle" },
-        ui: { kind: "navigate", href: resultado.tipo === "comercial" ? "/comercial" : "/juridico" },
+        ui: { kind: "navigate", href: "/comercial" },
         tipoAcao: "MOVER_KANBAN",
         executada: true,
       };

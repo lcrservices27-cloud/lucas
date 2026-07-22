@@ -3,13 +3,10 @@ import { subDays, startOfMonth } from "date-fns";
 import { prisma } from "@/lib/prisma";
 import { logTimeline } from "@/lib/actions/timeline";
 import { registrarPagamento } from "@/lib/actions/pagamentos";
-import { moveClienteComercial, moveClienteJuridico } from "@/lib/actions/clientes";
+import { moveClienteComercial } from "@/lib/actions/clientes";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
 import { normalizar } from "@/lib/assistant/normalize";
-import {
-  STATUS_COMERCIAL_LABEL,
-  STATUS_JURIDICO_LABEL,
-} from "@/lib/labels";
+import { STATUS_COMERCIAL_LABEL } from "@/lib/labels";
 import type { AssistenteDraftCliente, AssistenteUiAction, ListaItem } from "@/lib/assistant/types";
 
 export type ClienteCandidato = { id: string; nome: string; cidade: string | null };
@@ -98,19 +95,16 @@ export async function registrarPagamentoAssistente(clienteId: string, valor: num
 }
 
 const STATUS_KANBAN_NORMALIZADO = (() => {
-  const mapa: { normalizado: string; status: string; tipo: "comercial" | "juridico" }[] = [];
+  const mapa: { normalizado: string; status: string; tipo: "comercial" }[] = [];
   for (const [status, label] of Object.entries(STATUS_COMERCIAL_LABEL)) {
     mapa.push({ normalizado: normalizar(label), status, tipo: "comercial" });
-  }
-  for (const [status, label] of Object.entries(STATUS_JURIDICO_LABEL)) {
-    mapa.push({ normalizado: normalizar(label), status, tipo: "juridico" });
   }
   return mapa;
 })();
 
-export function resolverStatusKanban(alvo: string): { status: string; tipo: "comercial" | "juridico" } | null {
+export function resolverStatusKanban(alvo: string): { status: string; tipo: "comercial" } | null {
   const alvoNorm = normalizar(alvo);
-  let melhor: { status: string; tipo: "comercial" | "juridico"; pontos: number } | null = null;
+  let melhor: { status: string; tipo: "comercial"; pontos: number } | null = null;
 
   for (const opcao of STATUS_KANBAN_NORMALIZADO) {
     let pontos = 0;
@@ -130,11 +124,7 @@ export async function moverClienteKanban(clienteId: string, alvo: string) {
   const resolvido = resolverStatusKanban(alvo);
   if (!resolvido) return null;
 
-  if (resolvido.tipo === "comercial") {
-    await moveClienteComercial(clienteId, resolvido.status);
-  } else {
-    await moveClienteJuridico(clienteId, resolvido.status);
-  }
+  await moveClienteComercial(clienteId, resolvido.status);
 
   return resolvido;
 }
@@ -157,19 +147,6 @@ export async function buscarClientesPorFiltro(
     };
   }
 
-  if (f.includes("documento")) {
-    const clientes = await prisma.cliente.findMany({
-      where: { statusJuridico: "AGUARDANDO_DOCUMENTOS" },
-      select: { id: true, nome: true, cidade: true },
-      take: 30,
-    });
-    return {
-      titulo: "Clientes aguardando documentos",
-      itens: clientes.map((c) => ({ label: c.nome, sublabel: c.cidade ?? undefined, href: `/crm/${c.id}` })),
-      hrefLista: "/crm?statusJuridico=AGUARDANDO_DOCUMENTOS",
-    };
-  }
-
   if (f.includes("pagamento")) {
     const clientes = await prisma.cliente.findMany({
       where: { statusFinanceiro: { in: ["NAO_INICIADO", "PAGAMENTO_PARCIAL"] } },
@@ -185,14 +162,14 @@ export async function buscarClientesPorFiltro(
   if (f.includes("parado") || f.includes("30 dia")) {
     const clientes = await prisma.cliente.findMany({
       where: {
-        statusJuridico: { notIn: ["FINALIZADO", "CANCELADO"] },
+        statusComercial: { notIn: ["VENDA_FECHADA", "CANCELADO"] },
         atualizadoEm: { lt: subDays(new Date(), 30) },
       },
       select: { id: true, nome: true, cidade: true, atualizadoEm: true },
       take: 30,
     });
     return {
-      titulo: "Processos parados há mais de 30 dias",
+      titulo: "Clientes parados há mais de 30 dias",
       itens: clientes.map((c) => ({
         label: c.nome,
         sublabel: `Sem atividade desde ${formatDate(c.atualizadoEm)}`,

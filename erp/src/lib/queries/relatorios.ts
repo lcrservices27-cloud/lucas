@@ -9,7 +9,6 @@ export async function getRelatoriosData() {
   const [
     totalClientes,
     clientesPorStatusComercial,
-    clientesPorStatusJuridico,
     clientesCidadeEstado,
     clientesOrigem,
     clientesResponsavel,
@@ -20,7 +19,6 @@ export async function getRelatoriosData() {
   ] = await Promise.all([
     prisma.cliente.count(),
     prisma.cliente.groupBy({ by: ["statusComercial"], _count: true }),
-    prisma.cliente.groupBy({ by: ["statusJuridico"], _count: true }),
     prisma.cliente.findMany({ select: { cidade: true, estado: true } }),
     prisma.cliente.groupBy({ by: ["origemLead"], _count: true }),
     prisma.cliente.findMany({
@@ -45,13 +43,9 @@ export async function getRelatoriosData() {
     }),
   ]);
 
-  // Clientes por status comercial / jurídico
+  // Clientes por status comercial
   const porStatusComercial = clientesPorStatusComercial.map((g) => ({
     status: g.statusComercial as string,
-    count: g._count,
-  }));
-  const porStatusJuridico = clientesPorStatusJuridico.map((g) => ({
-    status: g.statusJuridico as string,
     count: g._count,
   }));
 
@@ -115,7 +109,6 @@ export async function getRelatoriosData() {
     clientes: {
       total: totalClientes,
       porStatusComercial,
-      porStatusJuridico,
       porCidade,
       porOrigem,
       porResponsavel,
@@ -125,9 +118,6 @@ export async function getRelatoriosData() {
       totalReceita,
       totalAReceber,
       receitaMensal,
-    },
-    processos: {
-      porStatusJuridico,
     },
     pagamentos,
   };

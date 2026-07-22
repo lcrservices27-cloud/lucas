@@ -58,20 +58,6 @@ enum StatusComercial {
   CANCELADO
 }
 
-enum StatusJuridico {
-  AGUARDANDO_DOCUMENTOS
-  DOCUMENTOS_RECEBIDOS
-  AGUARDANDO_ENVIO
-  ENVIADO_AO_PARCEIRO
-  EM_ANALISE
-  PROCESSO_PROTOCOLADO
-  AGUARDANDO_DECISAO
-  CONCLUIDO
-  AGUARDANDO_PAGAMENTO_FINAL
-  FINALIZADO
-  CANCELADO
-}
-
 enum StatusFinanceiro {
   NAO_INICIADO
   ENTRADA_PAGA
@@ -104,7 +90,6 @@ model Cliente {
   dataEntrada      DateTime @default(now())
 
   statusComercial  StatusComercial  @default(NOVO_LEAD)
-  statusJuridico   StatusJuridico   @default(AGUARDANDO_DOCUMENTOS)
   statusFinanceiro StatusFinanceiro @default(NAO_INICIADO)
 
   valorContratado  Decimal @default(0) @db.Decimal(12, 2)
@@ -126,7 +111,6 @@ model Cliente {
 
   @@index([nome])
   @@index([statusComercial])
-  @@index([statusJuridico])
   @@index([statusFinanceiro])
   @@index([atualizadoEm])
   @@map("clientes")

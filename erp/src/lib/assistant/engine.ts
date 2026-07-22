@@ -130,7 +130,7 @@ export async function resolverClarificacao(
     });
     return {
       fala: `${nome} foi movido para "${extra.statusAlvo}".`,
-      href: resultado.tipo === "comercial" ? "/comercial" : "/juridico",
+      href: "/comercial",
     };
   }
 

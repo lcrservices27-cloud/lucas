@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KpiCard } from "@/components/dashboard/kpi-card";
-import { ReceitaMensalChart, StatusProcessosChart } from "@/components/dashboard/charts";
+import { ReceitaMensalChart } from "@/components/dashboard/charts";
 import { ExportCsvButton } from "@/components/relatorios/export-csv-button";
 import { getRelatoriosData } from "@/lib/queries/relatorios";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { TIPO_PAGAMENTO_LABEL, METODO_PAGAMENTO_LABEL } from "@/lib/labels";
 
 export default async function RelatoriosPage() {
-  const { clientes, financeiro, processos, pagamentos } = await getRelatoriosData();
+  const { clientes, financeiro, pagamentos } = await getRelatoriosData();
 
   const cidadeRows = clientes.porCidade.map((c) => ({
     Cidade: c.cidade,
@@ -37,7 +37,7 @@ export default async function RelatoriosPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Relatórios</h1>
         <p className="text-sm text-muted-foreground">
-          Análises consolidadas de clientes, financeiro, processos e pagamentos.
+          Análises consolidadas de clientes, financeiro e pagamentos.
         </p>
       </div>
 
@@ -45,7 +45,6 @@ export default async function RelatoriosPage() {
         <TabsList>
           <TabsTrigger value="clientes">Clientes</TabsTrigger>
           <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
-          <TabsTrigger value="processos">Processos</TabsTrigger>
           <TabsTrigger value="pagamentos">Pagamentos</TabsTrigger>
         </TabsList>
 
@@ -145,17 +144,6 @@ export default async function RelatoriosPage() {
             </CardHeader>
             <CardContent>
               <ReceitaMensalChart data={financeiro.receitaMensal} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="processos" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Status dos processos jurídicos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <StatusProcessosChart data={processos.porStatusJuridico} />
             </CardContent>
           </Card>
         </TabsContent>

@@ -10,7 +10,6 @@ export async function getClientesKanban() {
       estado: true,
       valorContratado: true,
       statusComercial: true,
-      statusJuridico: true,
       atualizadoEm: true,
       responsavel: { select: { nome: true } },
     },

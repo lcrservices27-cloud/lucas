@@ -15,7 +15,6 @@ export async function getDashboardData() {
   const [
     totalClientes,
     clientesPorStatusComercial,
-    clientesPorStatusJuridico,
     clientesPorStatusFinanceiro,
     pagamentos,
     parcelasPendentes,
@@ -28,7 +27,6 @@ export async function getDashboardData() {
   ] = await Promise.all([
     prisma.cliente.count(),
     prisma.cliente.groupBy({ by: ["statusComercial"], _count: true }),
-    prisma.cliente.groupBy({ by: ["statusJuridico"], _count: true }),
     prisma.cliente.groupBy({ by: ["statusFinanceiro"], _count: true }),
     prisma.pagamento.findMany({
       where: { dataPagamento: { gte: seiseMesesAtras } },
@@ -60,43 +58,22 @@ export async function getDashboardData() {
     }),
     prisma.cliente.findMany({
       where: { statusComercial: "VENDA_FECHADA" },
-      select: { valorContratado: true, dataEntrada: true, atualizadoEm: true, statusJuridico: true },
+      select: { valorContratado: true, dataEntrada: true, atualizadoEm: true },
     }),
   ]);
 
   const countByComercial = Object.fromEntries(
     clientesPorStatusComercial.map((g) => [g.statusComercial, g._count])
   ) as Record<string, number>;
-  const countByJuridico = Object.fromEntries(
-    clientesPorStatusJuridico.map((g) => [g.statusJuridico, g._count])
-  ) as Record<string, number>;
   const countByFinanceiro = Object.fromEntries(
     clientesPorStatusFinanceiro.map((g) => [g.statusFinanceiro, g._count])
   ) as Record<string, number>;
 
-  const clientesAtivos = totalClientes - (countByComercial["CANCELADO"] ?? 0) - (countByJuridico["FINALIZADO"] ?? 0);
-  const clientesConcluidos = countByJuridico["FINALIZADO"] ?? 0;
+  const clientesAtivos = totalClientes - (countByComercial["CANCELADO"] ?? 0);
+  const vendasFechadasTotal = countByComercial["VENDA_FECHADA"] ?? 0;
   const clientesAguardandoPagamento =
     (countByFinanceiro["NAO_INICIADO"] ?? 0) + (countByFinanceiro["PAGAMENTO_PARCIAL"] ?? 0);
   const clientesInadimplentes = countByFinanceiro["ATRASADO"] ?? 0;
-  const clientesAguardandoDocumentacao = countByJuridico["AGUARDANDO_DOCUMENTOS"] ?? 0;
-
-  const processosEnviados =
-    (countByJuridico["ENVIADO_AO_PARCEIRO"] ?? 0) +
-    (countByJuridico["EM_ANALISE"] ?? 0) +
-    (countByJuridico["PROCESSO_PROTOCOLADO"] ?? 0) +
-    (countByJuridico["AGUARDANDO_DECISAO"] ?? 0) +
-    (countByJuridico["CONCLUIDO"] ?? 0) +
-    (countByJuridico["AGUARDANDO_PAGAMENTO_FINAL"] ?? 0) +
-    (countByJuridico["FINALIZADO"] ?? 0);
-  const processosEmAndamento =
-    (countByJuridico["DOCUMENTOS_RECEBIDOS"] ?? 0) +
-    (countByJuridico["AGUARDANDO_ENVIO"] ?? 0) +
-    (countByJuridico["ENVIADO_AO_PARCEIRO"] ?? 0) +
-    (countByJuridico["EM_ANALISE"] ?? 0) +
-    (countByJuridico["PROCESSO_PROTOCOLADO"] ?? 0) +
-    (countByJuridico["AGUARDANDO_DECISAO"] ?? 0);
-  const processosFinalizados = countByJuridico["FINALIZADO"] ?? 0;
 
   const receitaMes = pagamentos
     .filter((p) => p.dataPagamento >= inicioMes)
@@ -114,11 +91,10 @@ export async function getDashboardData() {
 
   const conversaoVendas = totalClientes > 0 ? (vendasFechadas.length / totalClientes) * 100 : 0;
 
-  const finalizados = vendasFechadas.filter((c) => c.statusJuridico === "FINALIZADO");
-  const tempoMedioProcesso =
-    finalizados.length > 0
-      ? finalizados.reduce((acc, c) => acc + differenceInCalendarDays(c.atualizadoEm, c.dataEntrada), 0) /
-        finalizados.length
+  const tempoMedioFechamento =
+    vendasFechadas.length > 0
+      ? vendasFechadas.reduce((acc, c) => acc + differenceInCalendarDays(c.atualizadoEm, c.dataEntrada), 0) /
+        vendasFechadas.length
       : 0;
 
   // Séries mensais (últimos 6 meses)
@@ -147,28 +123,24 @@ export async function getDashboardData() {
     return { mes: format(mesInicio, "MMM", { locale: ptBR }), receitas, despesas, saldo: receitas - despesas };
   });
 
-  const statusProcessos = Object.entries(countByJuridico).map(([status, count]) => ({ status, count }));
+  const statusComercial = Object.entries(countByComercial).map(([status, count]) => ({ status, count }));
 
   return {
     cards: {
       totalClientes,
       clientesAtivos,
-      clientesConcluidos,
+      vendasFechadas: vendasFechadasTotal,
       clientesAguardandoPagamento,
       clientesInadimplentes,
-      clientesAguardandoDocumentacao,
-      processosEnviados,
-      processosEmAndamento,
-      processosFinalizados,
       receitaMes,
       receitaAno,
       valorRecebido,
       valorPendente,
       ticketMedio,
       conversaoVendas,
-      tempoMedioProcesso,
+      tempoMedioFechamento,
     },
-    charts: { receitaMensal, clientesPorMes, fluxoCaixa, statusProcessos },
+    charts: { receitaMensal, clientesPorMes, fluxoCaixa, statusComercial },
     timelineRecente,
     alertas: {
       tarefasVencidas,

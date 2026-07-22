@@ -9,10 +9,14 @@ Claude Code (web). Este arquivo é a memória do projeto — leia antes de mexer
 ## Estado atual (o que já está PRONTO e testado)
 
 - **Todos os módulos funcionais**: Dashboard (KPIs + 4 gráficos), CRM
-  (lista TanStack Table + ficha do cliente com abas), Kanban Comercial e
-  Jurídico (drag-and-drop dnd-kit persistido), Financeiro (fluxo de caixa,
+  (lista TanStack Table + ficha do cliente com abas), Kanban Comercial
+  (drag-and-drop dnd-kit persistido), Financeiro (fluxo de caixa,
   parcelas, pagamentos), Agenda (calendário próprio), Tarefas, Relatórios
   (com export CSV), Usuários (papéis), Configurações (perfil/senha/tema).
+  O Kanban Jurídico e o campo `statusJuridico` foram removidos do sistema
+  (migração `remove_kanban_juridico`) — o ERP hoje só acompanha a fase
+  comercial e financeira do cliente. O papel de usuário "Jurídico" (cargo
+  de pessoa, ex. Diego) foi mantido, é conceito diferente.
 - **Assistente de voz com IA** (botão flutuante global): Web Speech API
   (STT/TTS) + campo de texto; dois motores em `src/lib/assistant/` —
   `heuristica.ts` (regras, funciona sem chave) e `llm.ts` (Claude tool-use,
