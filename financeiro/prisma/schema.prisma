@@ -1,14 +1,16 @@
 // Prisma schema — Lucas Rufino Financeiro
 //
-// Desenvolvimento usa SQLite. Para produção na Vercel, troque o provider
-// para "postgresql" (Neon, Supabase, Vercel Postgres) e ajuste DATABASE_URL.
+// Usa PostgreSQL (Neon, Supabase, Vercel Postgres, etc.) — persiste no
+// filesystem efêmero da Vercel. Defina DATABASE_URL no .env / nas variáveis
+// de ambiente do projeto. Para rodar localmente sem um Postgres na nuvem,
+// veja o README (Docker em uma linha ou Postgres local).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
