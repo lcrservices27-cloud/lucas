@@ -57,6 +57,22 @@ Login: `lucasrufino@financeiro.app` / `12345678`.
 
 ## Deploy na Vercel
 
+### Opção rápida — script automatizado
+
+Da pasta `financeiro/`, rode:
+
+```bash
+./deploy.sh
+```
+
+Ele instala a Vercel CLI (se preciso), faz login, vincula o projeto (Root
+Directory = `financeiro`), pede a `DATABASE_URL` do Postgres, gera o
+`NEXTAUTH_SECRET`, configura as variáveis, faz o deploy de produção e ajusta o
+`NEXTAUTH_URL`. No fim mostra a URL pública. Você pode pré-definir valores:
+`DATABASE_URL="postgresql://..." ./deploy.sh`.
+
+### Opção manual (painel da Vercel)
+
 1. Suba este diretório (`financeiro/`) para um repositório e importe na Vercel
    (defina **Root Directory = `financeiro`** se o repo tiver outros arquivos).
 2. Crie um Postgres gerenciado — **Vercel Postgres** (Storage → Create), **Neon**
