@@ -1,0 +1,77 @@
+// Prisma schema — Lucas Rufino Financeiro
+//
+// Desenvolvimento usa SQLite. Para produção na Vercel, troque o provider
+// para "postgresql" (Neon, Supabase, Vercel Postgres) e ajuste DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  transactions   Transaction[]
+  fixedExpenses  FixedExpense[]
+  savingsGoals   SavingsGoal[]
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  type          String // "entrada" | "saida"
+  amount        Float
+  category      String
+  description   String   @default("")
+  paymentMethod String // "pix" | "dinheiro" | "debito" | "credito" | "transferencia"
+  date          DateTime
+  createdAt     DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([userId, category])
+  @@index([userId, type])
+}
+
+model FixedExpense {
+  id        String   @id @default(cuid())
+  name      String
+  // Valor mensal da despesa. Para "Alimentação" guardamos o valor já
+  // mensalizado (R$ 70/dia x 30 = R$ 2.100).
+  amount    Float
+  // Metadados opcionais para despesas calculadas por dia.
+  perDay    Float?
+  daysBase  Int?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model SavingsGoal {
+  id            String   @id @default(cuid())
+  // Meta mensal de economia (R$).
+  monthlyTarget Float
+  // Objetivo total e prazo (ex.: R$ 40.000 em 3 meses).
+  totalTarget   Float?
+  months        Int?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
