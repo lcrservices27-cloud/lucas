@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/auth";
-import { getClientesList, getUsuariosAtivos } from "@/lib/queries/clientes";
+import { getClientesList } from "@/lib/queries/clientes";
 import { ClientesTable } from "@/components/crm/clientes-table";
 import { NovoClienteSheet } from "@/components/crm/novo-cliente-sheet";
 
@@ -8,10 +8,9 @@ export default async function CrmPage({
 }: {
   searchParams: Promise<{ statusFinanceiro?: string }>;
 }) {
-  const [{ statusFinanceiro }, clientes, usuarios, usuarioAtual] = await Promise.all([
+  const [{ statusFinanceiro }, clientes, usuarioAtual] = await Promise.all([
     searchParams,
     getClientesList(),
-    getUsuariosAtivos(),
     requireUser(),
   ]);
 
@@ -22,7 +21,7 @@ export default async function CrmPage({
           <h1 className="text-2xl font-semibold tracking-tight">Clientes</h1>
           <p className="text-sm text-muted-foreground">Cadastro completo, busca instantânea e filtros.</p>
         </div>
-        <NovoClienteSheet usuarios={usuarios} />
+        <NovoClienteSheet />
       </div>
 
       <ClientesTable

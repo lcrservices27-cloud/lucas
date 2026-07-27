@@ -28,12 +28,10 @@ import type { ClienteDetail } from "@/lib/queries/cliente-detail";
 
 export function ClienteHeader({
   cliente,
-  usuarios,
   saldo,
   isAdmin = false,
 }: {
   cliente: ClienteDetail;
-  usuarios: { id: string; nome: string }[];
   saldo: number;
   isAdmin?: boolean;
 }) {
@@ -92,7 +90,6 @@ export function ClienteHeader({
             </SheetHeader>
             <div className="px-4 pb-4">
               <ClienteForm
-                usuarios={usuarios}
                 onSubmit={handleSubmit}
                 submitLabel="Salvar alterações"
                 defaultValues={{
@@ -103,7 +100,6 @@ export function ClienteHeader({
                   telefone: cliente.telefone ?? "",
                   whatsapp: cliente.whatsapp ?? "",
                   endereco: cliente.endereco ?? "",
-                  responsavelId: cliente.responsavelId ?? "",
                   produto: cliente.produto ?? undefined,
                   valorContratado: Number(cliente.valorContratado),
                   valorPago: 0,

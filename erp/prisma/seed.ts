@@ -59,7 +59,7 @@ async function main() {
 
   const usuarios = await Promise.all(
     [
-      { nome: "Lucas Andrade", email: "lucas@lucaslimpanome.com.br", papel: PapelUsuario.ADMINISTRADOR },
+      { nome: "Lucas Martins", email: "lucas@lucaslimpanome.com.br", papel: PapelUsuario.ADMINISTRADOR },
       { nome: "Marina Costa", email: "marina@lucaslimpanome.com.br", papel: PapelUsuario.FINANCEIRO },
       { nome: "Rafael Souza", email: "rafael@lucaslimpanome.com.br", papel: PapelUsuario.ATENDIMENTO },
       { nome: "Bianca Lima", email: "bianca@lucaslimpanome.com.br", papel: PapelUsuario.CONSULTOR },

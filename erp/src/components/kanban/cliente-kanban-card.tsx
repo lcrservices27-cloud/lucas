@@ -57,9 +57,6 @@ export function ClienteKanbanCard({ cliente }: { cliente: KanbanCliente }) {
             </div>
           )}
         </div>
-        {cliente.responsavel && (
-          <p className="mt-1.5 truncate text-[11px] text-muted-foreground">{cliente.responsavel}</p>
-        )}
       </CardContent>
     </Card>
   );

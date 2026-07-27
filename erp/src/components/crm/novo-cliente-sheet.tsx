@@ -15,7 +15,7 @@ import { ClienteForm } from "@/components/crm/cliente-form";
 import { createCliente } from "@/lib/actions/clientes";
 import type { ClienteFormValues } from "@/lib/validators/cliente";
 
-export function NovoClienteSheet({ usuarios }: { usuarios: { id: string; nome: string }[] }) {
+export function NovoClienteSheet() {
   const [open, setOpen] = React.useState(false);
 
   async function handleSubmit(values: ClienteFormValues) {
@@ -39,7 +39,7 @@ export function NovoClienteSheet({ usuarios }: { usuarios: { id: string; nome: s
           <SheetDescription>Cadastre um novo cliente no CRM.</SheetDescription>
         </SheetHeader>
         <div className="px-4 pb-4">
-          <ClienteForm usuarios={usuarios} onSubmit={handleSubmit} submitLabel="Cadastrar cliente" />
+          <ClienteForm onSubmit={handleSubmit} submitLabel="Cadastrar cliente" />
         </div>
       </SheetContent>
     </Sheet>

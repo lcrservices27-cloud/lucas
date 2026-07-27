@@ -20,15 +20,11 @@ import { clienteSchema, type ClienteFormValues } from "@/lib/validators/cliente"
 import { FORMA_PAGAMENTO_LABEL, PRODUTO_LABEL, TIPO_PESSOA_LABEL, TIPO_PESSOA_ORDER } from "@/lib/labels";
 import { formatCurrency } from "@/lib/utils";
 
-type Usuario = { id: string; nome: string };
-
 export function ClienteForm({
-  usuarios,
   defaultValues,
   onSubmit,
   submitLabel = "Salvar",
 }: {
-  usuarios: Usuario[];
   defaultValues?: Partial<ClienteFormValues>;
   onSubmit: (data: ClienteFormValues) => Promise<{ error?: string; fieldErrors?: Record<string, string[]> } | void>;
   submitLabel?: string;
@@ -43,7 +39,6 @@ export function ClienteForm({
       telefone: "",
       whatsapp: "",
       endereco: "",
-      responsavelId: "",
       produto: undefined,
       valorContratado: 0,
       valorPago: 0,
@@ -157,24 +152,6 @@ export function ClienteForm({
         <div className="col-span-full space-y-1.5">
           <Label htmlFor="endereco">Endereço</Label>
           <Input id="endereco" {...form.register("endereco")} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="responsavelId">Responsável</Label>
-          <Select
-            value={form.watch("responsavelId") || undefined}
-            onValueChange={(v) => form.setValue("responsavelId", v)}
-          >
-            <SelectTrigger id="responsavelId" className="w-full">
-              <SelectValue placeholder="Selecionar" />
-            </SelectTrigger>
-            <SelectContent>
-              {usuarios.map((u) => (
-                <SelectItem key={u.id} value={u.id}>
-                  {u.nome}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
         <div className="col-span-full mt-1 border-t pt-3">
           <p className="text-sm font-semibold text-muted-foreground">Serviço e pagamento</p>

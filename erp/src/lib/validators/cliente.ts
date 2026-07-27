@@ -12,7 +12,6 @@ export const clienteSchema = z
     telefone: z.string().trim().optional().or(z.literal("")),
     whatsapp: z.string().trim().optional().or(z.literal("")),
     endereco: z.string().trim().optional().or(z.literal("")),
-    responsavelId: z.string().trim().optional().or(z.literal("")),
     valorContratado: z.coerce.number().min(0, "Informe o valor total"),
     valorPago: z.coerce.number().min(0).optional().default(0),
     formaPagamento: z.enum(["A_VISTA", "ENTRADA_MAIS_PARCELAS", "PARCELADO"], {

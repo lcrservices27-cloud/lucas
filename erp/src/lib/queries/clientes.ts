@@ -3,9 +3,6 @@ import { prisma } from "@/lib/prisma";
 export async function getClientesList() {
   const clientes = await prisma.cliente.findMany({
     orderBy: { criadoEm: "desc" },
-    include: {
-      responsavel: { select: { id: true, nome: true } },
-    },
   });
 
   return clientes.map((c) => ({
@@ -17,7 +14,6 @@ export async function getClientesList() {
     telefone: c.telefone,
     whatsapp: c.whatsapp,
     produto: c.produto,
-    responsavel: c.responsavel?.nome ?? null,
     dataEntrada: c.dataEntrada,
     statusComercial: c.statusComercial,
     statusFinanceiro: c.statusFinanceiro,

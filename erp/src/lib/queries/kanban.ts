@@ -10,7 +10,6 @@ export async function getClientesKanban() {
       valorContratado: true,
       statusComercial: true,
       atualizadoEm: true,
-      responsavel: { select: { nome: true } },
       pagamentos: { select: { valor: true } },
     },
   });
@@ -27,7 +26,6 @@ export async function getClientesKanban() {
       restante: Math.max(0, total - pago),
       statusComercial: c.statusComercial,
       atualizadoEm: c.atualizadoEm,
-      responsavel: c.responsavel?.nome ?? null,
     };
   });
 }

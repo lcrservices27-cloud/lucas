@@ -41,7 +41,6 @@ export function TabDados({ cliente }: { cliente: ClienteDetail }) {
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
           <Field label="Produto contratado" value={cliente.produto ? PRODUTO_LABEL[cliente.produto] : null} />
-          <Field label="Responsável" value={cliente.responsavel?.nome} />
           <Field label="Data de entrada" value={new Date(cliente.dataEntrada).toLocaleDateString("pt-BR")} />
         </CardContent>
       </Card>

@@ -99,11 +99,6 @@ const baseColumns: ColumnDef<ClienteListItem>[] = [
     cell: ({ row }) => <span className="tabular-nums">{formatCurrency(row.original.valorContratado)}</span>,
   },
   {
-    accessorKey: "responsavel",
-    header: "Responsável",
-    cell: ({ row }) => <span className="text-sm">{row.original.responsavel ?? "—"}</span>,
-  },
-  {
     accessorKey: "dataEntrada",
     header: ({ column }) => (
       <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>

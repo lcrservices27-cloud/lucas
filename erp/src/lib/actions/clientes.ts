@@ -55,7 +55,8 @@ export async function createCliente(_prevState: FormState, formData: FormData): 
       telefone: toNullable(data.telefone),
       whatsapp: toNullable(data.whatsapp),
       endereco: toNullable(data.endereco),
-      responsavelId: toNullable(data.responsavelId),
+      // Operação de uma pessoa só: quem cadastra fica como responsável.
+      responsavelId: usuario.id,
       produto: data.produto,
       dataEntrada: data.dataEntrada ? new Date(data.dataEntrada) : undefined,
       valorContratado: total,
@@ -114,7 +115,6 @@ export async function updateCliente(clienteId: string, _prevState: FormState, fo
       telefone: toNullable(data.telefone),
       whatsapp: toNullable(data.whatsapp),
       endereco: toNullable(data.endereco),
-      responsavelId: toNullable(data.responsavelId),
       produto: data.produto,
       valorContratado: data.valorContratado ?? 0,
       formaPagamento: data.formaPagamento,
