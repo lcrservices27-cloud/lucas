@@ -57,14 +57,11 @@ async function main() {
   console.log("Criando usuários...");
   const senhaHash = await bcrypt.hash("lucas123", 10);
 
+  // Operação de uma pessoa só — um único usuário, administrador.
   const usuarios = await Promise.all(
-    [
-      { nome: "Lucas Martins", email: "lucas@lucaslimpanome.com.br", papel: PapelUsuario.ADMINISTRADOR },
-      { nome: "Marina Costa", email: "marina@lucaslimpanome.com.br", papel: PapelUsuario.FINANCEIRO },
-      { nome: "Rafael Souza", email: "rafael@lucaslimpanome.com.br", papel: PapelUsuario.ATENDIMENTO },
-      { nome: "Bianca Lima", email: "bianca@lucaslimpanome.com.br", papel: PapelUsuario.CONSULTOR },
-      { nome: "Diego Martins", email: "diego@lucaslimpanome.com.br", papel: PapelUsuario.JURIDICO },
-    ].map((u) => prisma.usuario.create({ data: { ...u, senhaHash } }))
+    [{ nome: "Lucas Martins", email: "lucas@lucaslimpanome.com.br", papel: PapelUsuario.ADMINISTRADOR }].map((u) =>
+      prisma.usuario.create({ data: { ...u, senhaHash } })
+    )
   );
 
   console.log("Criando clientes...");
