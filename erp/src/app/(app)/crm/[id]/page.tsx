@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { requireUser } from "@/lib/auth";
 import { getClienteDetail } from "@/lib/queries/cliente-detail";
 import { getUsuariosAtivos } from "@/lib/queries/clientes";
 import { ClienteHeader } from "@/components/crm/cliente-header";
@@ -10,14 +11,23 @@ import { TabTimeline } from "@/components/crm/tab-timeline";
 
 export default async function ClienteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [cliente, usuarios] = await Promise.all([getClienteDetail(id), getUsuariosAtivos()]);
+  const [cliente, usuarios, usuarioAtual] = await Promise.all([
+    getClienteDetail(id),
+    getUsuariosAtivos(),
+    requireUser(),
+  ]);
 
   const totalPago = cliente.pagamentos.reduce((acc, p) => acc + Number(p.valor), 0);
   const saldo = Number(cliente.valorContratado) - totalPago;
 
   return (
     <div className="space-y-6">
-      <ClienteHeader cliente={cliente} usuarios={usuarios} saldo={saldo} />
+      <ClienteHeader
+        cliente={cliente}
+        usuarios={usuarios}
+        saldo={saldo}
+        isAdmin={usuarioAtual.papel === "ADMINISTRADOR"}
+      />
 
       <Tabs defaultValue="dados">
         <TabsList>

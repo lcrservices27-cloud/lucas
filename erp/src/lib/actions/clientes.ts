@@ -2,10 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { rm } from "node:fs/promises";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, assertUser } from "@/lib/auth";
+import { getCurrentUser, assertUser, assertAdmin } from "@/lib/auth";
 import { clienteSchema } from "@/lib/validators/cliente";
 import { logTimeline } from "@/lib/actions/timeline";
+import { resolveStoragePath } from "@/lib/storage";
 import { calcularStatusCliente } from "@/lib/status-cliente";
 import { formatCurrency } from "@/lib/utils";
 import { STATUS_COMERCIAL_ORDER, STATUS_COMERCIAL_LABEL } from "@/lib/labels";
@@ -125,6 +127,34 @@ export async function updateCliente(clienteId: string, _prevState: FormState, fo
   revalidatePath(`/crm/${clienteId}`);
   revalidatePath("/crm");
   return {};
+}
+
+export async function excluirCliente(clienteId: string): Promise<void> {
+  await assertAdmin();
+
+  const cliente = await prisma.cliente.findUnique({
+    where: { id: clienteId },
+    select: { id: true, nome: true },
+  });
+  if (!cliente) throw new Error("Cliente não encontrado.");
+
+  // A cascata do banco remove parcelas, pagamentos, documentos, observações e
+  // timeline; eventos da agenda sobrevivem com clienteId nulo (onDelete: SetNull).
+  await prisma.cliente.delete({ where: { id: cliente.id } });
+
+  // Os arquivos enviados vivem fora do banco — limpa a pasta do cliente.
+  const dir = resolveStoragePath(cliente.id);
+  if (dir) {
+    try {
+      await rm(dir, { recursive: true, force: true });
+    } catch {
+      // pasta pode não existir ou o disco ser efêmero (serverless)
+    }
+  }
+
+  // O cliente aparece em quase todos os módulos (KPIs, kanban, fluxo de caixa,
+  // relatórios, carteira dos usuários): invalida o cache do app inteiro.
+  revalidatePath("/", "layout");
 }
 
 export async function updateStatusComercial(clienteId: string, statusComercial: string) {

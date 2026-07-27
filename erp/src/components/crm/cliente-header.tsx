@@ -14,6 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ClienteForm } from "@/components/crm/cliente-form";
+import { ExcluirClienteDialog } from "@/components/crm/excluir-cliente-dialog";
 import { updateCliente } from "@/lib/actions/clientes";
 import type { ClienteFormValues } from "@/lib/validators/cliente";
 import { STATUS_COMERCIAL_LABEL, STATUS_FINANCEIRO_LABEL, STATUS_FINANCEIRO_BADGE } from "@/lib/labels";
@@ -24,10 +25,12 @@ export function ClienteHeader({
   cliente,
   usuarios,
   saldo,
+  isAdmin = false,
 }: {
   cliente: ClienteDetail;
   usuarios: { id: string; nome: string }[];
   saldo: number;
+  isAdmin?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -109,6 +112,9 @@ export function ClienteHeader({
             </div>
           </SheetContent>
         </Sheet>
+        {isAdmin && (
+          <ExcluirClienteDialog clienteId={cliente.id} clienteNome={cliente.nome} redirectToList />
+        )}
       </div>
     </div>
   );

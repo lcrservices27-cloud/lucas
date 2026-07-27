@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ExcluirClienteDialog } from "@/components/crm/excluir-cliente-dialog";
 import type { ClienteListItem } from "@/lib/queries/clientes";
 import {
   STATUS_COMERCIAL_LABEL,
@@ -35,7 +36,7 @@ import {
 } from "@/lib/labels";
 import { formatCurrency, formatDate, initials } from "@/lib/utils";
 
-const columns: ColumnDef<ClienteListItem>[] = [
+const baseColumns: ColumnDef<ClienteListItem>[] = [
   {
     accessorKey: "nome",
     header: ({ column }) => (
@@ -115,13 +116,31 @@ const columns: ColumnDef<ClienteListItem>[] = [
   },
 ];
 
+// Só entra na tabela para administradores (a Server Action também exige o papel).
+const acoesColumn: ColumnDef<ClienteListItem> = {
+  id: "acoes",
+  header: () => <span className="sr-only">Ações</span>,
+  enableGlobalFilter: false,
+  cell: ({ row }) => (
+    <div className="flex justify-end">
+      <ExcluirClienteDialog clienteId={row.original.id} clienteNome={row.original.nome} iconOnly />
+    </div>
+  ),
+};
+
 export function ClientesTable({
   data,
   initialStatusFinanceiro,
+  isAdmin = false,
 }: {
   data: ClienteListItem[];
   initialStatusFinanceiro?: string;
+  isAdmin?: boolean;
 }) {
+  const columns = React.useMemo(
+    () => (isAdmin ? [...baseColumns, acoesColumn] : baseColumns),
+    [isAdmin]
+  );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([{ id: "dataEntrada", desc: true }]);
   const [statusComercial, setStatusComercial] = React.useState("all");

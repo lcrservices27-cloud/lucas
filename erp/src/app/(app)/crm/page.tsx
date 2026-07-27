@@ -1,3 +1,4 @@
+import { requireUser } from "@/lib/auth";
 import { getClientesList, getUsuariosAtivos } from "@/lib/queries/clientes";
 import { ClientesTable } from "@/components/crm/clientes-table";
 import { NovoClienteSheet } from "@/components/crm/novo-cliente-sheet";
@@ -7,10 +8,11 @@ export default async function CrmPage({
 }: {
   searchParams: Promise<{ statusFinanceiro?: string }>;
 }) {
-  const [{ statusFinanceiro }, clientes, usuarios] = await Promise.all([
+  const [{ statusFinanceiro }, clientes, usuarios, usuarioAtual] = await Promise.all([
     searchParams,
     getClientesList(),
     getUsuariosAtivos(),
+    requireUser(),
   ]);
 
   return (
@@ -23,7 +25,11 @@ export default async function CrmPage({
         <NovoClienteSheet usuarios={usuarios} />
       </div>
 
-      <ClientesTable data={clientes} initialStatusFinanceiro={statusFinanceiro} />
+      <ClientesTable
+        data={clientes}
+        initialStatusFinanceiro={statusFinanceiro}
+        isAdmin={usuarioAtual.papel === "ADMINISTRADOR"}
+      />
     </div>
   );
 }
