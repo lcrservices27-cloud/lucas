@@ -10,14 +10,14 @@ import { calcularStatusCliente } from "@/lib/status-cliente";
 import { STATUS_COMERCIAL_LABEL } from "@/lib/labels";
 import type { AssistenteDraftCliente, AssistenteUiAction, ListaItem } from "@/lib/assistant/types";
 
-export type ClienteCandidato = { id: string; nome: string; cidade: string | null };
+export type ClienteCandidato = { id: string; nome: string; telefone: string | null };
 
 export async function buscarClientesCandidatos(consulta: string, limite = 5): Promise<ClienteCandidato[]> {
   const alvo = normalizar(consulta);
   if (!alvo) return [];
 
   const clientes = await prisma.cliente.findMany({
-    select: { id: true, nome: true, cidade: true },
+    select: { id: true, nome: true, telefone: true },
   });
 
   const tokensAlvo = alvo.split(/\s+/).filter((t) => t.length > 1);
@@ -60,11 +60,11 @@ export async function criarClienteAssistente(draft: AssistenteDraftCliente) {
   const cliente = await prisma.cliente.create({
     data: {
       nome: draft.nome ?? "Cliente sem nome",
-      cpf: draft.cpf || null,
+      tipoPessoa: draft.cnpj ? "JURIDICA" : "FISICA",
+      cpf: draft.cnpj ? null : draft.cpf || null,
+      cnpj: draft.cnpj || null,
       telefone: draft.telefone || null,
       whatsapp: draft.telefone || null,
-      cidade: draft.cidade || null,
-      origemLead: "Assistente de voz",
       valorContratado,
       statusComercial: comercial,
       statusFinanceiro: financeiro,
@@ -140,12 +140,12 @@ export async function buscarClientesPorFiltro(
   if (f.includes("inadimplente") || f.includes("atrasad")) {
     const clientes = await prisma.cliente.findMany({
       where: { statusFinanceiro: "ATRASADO" },
-      select: { id: true, nome: true, cidade: true },
+      select: { id: true, nome: true, telefone: true },
       take: 30,
     });
     return {
       titulo: "Clientes inadimplentes",
-      itens: clientes.map((c) => ({ label: c.nome, sublabel: c.cidade ?? undefined, href: `/crm/${c.id}` })),
+      itens: clientes.map((c) => ({ label: c.nome, sublabel: c.telefone ?? undefined, href: `/crm/${c.id}` })),
       hrefLista: "/crm?statusFinanceiro=ATRASADO",
     };
   }
@@ -153,12 +153,12 @@ export async function buscarClientesPorFiltro(
   if (f.includes("pagamento")) {
     const clientes = await prisma.cliente.findMany({
       where: { statusFinanceiro: { in: ["NAO_INICIADO", "PAGAMENTO_PARCIAL"] } },
-      select: { id: true, nome: true, cidade: true },
+      select: { id: true, nome: true, telefone: true },
       take: 30,
     });
     return {
       titulo: "Clientes aguardando pagamento",
-      itens: clientes.map((c) => ({ label: c.nome, sublabel: c.cidade ?? undefined, href: `/crm/${c.id}` })),
+      itens: clientes.map((c) => ({ label: c.nome, sublabel: c.telefone ?? undefined, href: `/crm/${c.id}` })),
     };
   }
 
@@ -168,7 +168,7 @@ export async function buscarClientesPorFiltro(
         statusComercial: { notIn: ["VENDA_FECHADA", "CANCELADO"] },
         atualizadoEm: { lt: subDays(new Date(), 30) },
       },
-      select: { id: true, nome: true, cidade: true, atualizadoEm: true },
+      select: { id: true, nome: true, atualizadoEm: true },
       take: 30,
     });
     return {
@@ -182,13 +182,13 @@ export async function buscarClientesPorFiltro(
   }
 
   const clientes = await prisma.cliente.findMany({
-    select: { id: true, nome: true, cidade: true },
+    select: { id: true, nome: true, telefone: true },
     take: 20,
     orderBy: { criadoEm: "desc" },
   });
   return {
     titulo: "Clientes",
-    itens: clientes.map((c) => ({ label: c.nome, sublabel: c.cidade ?? undefined, href: `/crm/${c.id}` })),
+    itens: clientes.map((c) => ({ label: c.nome, sublabel: c.telefone ?? undefined, href: `/crm/${c.id}` })),
   };
 }
 

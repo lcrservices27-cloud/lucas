@@ -15,20 +15,11 @@ import {
   TipoLancamento,
   PapelUsuario,
   Produto,
+  TipoPessoa,
 } from "../src/generated/prisma/enums";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
-
-const ESTADOS_CIDADES: Record<string, string[]> = {
-  CE: ["Fortaleza", "Caucaia", "Juazeiro do Norte", "Sobral"],
-  SP: ["São Paulo", "Campinas", "Guarulhos"],
-  RJ: ["Rio de Janeiro", "Niterói"],
-  PE: ["Recife", "Olinda"],
-  BA: ["Salvador", "Feira de Santana"],
-};
-
-const ORIGENS_LEAD = ["Instagram Ads", "Google Ads", "Indicação", "WhatsApp", "Site", "Facebook Ads"];
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -80,9 +71,9 @@ async function main() {
   const totalClientes = 60;
 
   for (let i = 0; i < totalClientes; i++) {
-    const nome = faker.person.fullName();
-    const estado = pick(Object.keys(ESTADOS_CIDADES));
-    const cidade = pick(ESTADOS_CIDADES[estado]);
+    // 1 em cada 4 clientes é empresa (CNPJ) — o resto é pessoa física (CPF).
+    const empresa = i % 4 === 0;
+    const nome = empresa ? faker.company.name() : faker.person.fullName();
     const produto = pick([Produto.RATING_COMERCIAL, Produto.LIMPA_NOME]);
     const valorContratado =
       produto === Produto.RATING_COMERCIAL
@@ -122,15 +113,12 @@ async function main() {
     const cliente = await prisma.cliente.create({
       data: {
         nome,
-        cpf: faker.helpers.replaceSymbols("###.###.###-##"),
-        rg: faker.helpers.replaceSymbols("##.###.###-#"),
+        tipoPessoa: empresa ? TipoPessoa.JURIDICA : TipoPessoa.FISICA,
+        cpf: empresa ? null : faker.helpers.replaceSymbols("###.###.###-##"),
+        cnpj: empresa ? faker.helpers.replaceSymbols("##.###.###/####-##") : null,
         telefone: faker.phone.number({ style: "national" }),
         whatsapp: faker.phone.number({ style: "national" }),
-        email: faker.internet.email({ firstName: nome.split(" ")[0] }).toLowerCase(),
-        cidade,
-        estado,
         endereco: faker.location.streetAddress(),
-        origemLead: pick(ORIGENS_LEAD),
         responsavelId: pick(usuarios).id,
         dataEntrada,
         produto,

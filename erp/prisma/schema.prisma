@@ -58,6 +58,12 @@ enum Produto {
   LIMPA_NOME
 }
 
+// Cliente pode ser pessoa física (CPF) ou empresa (CNPJ).
+enum TipoPessoa {
+  FISICA
+  JURIDICA
+}
+
 enum StatusFinanceiro {
   NAO_INICIADO
   ENTRADA_PAGA
@@ -76,15 +82,12 @@ enum FormaPagamento {
 model Cliente {
   id               String   @id @default(cuid())
   nome             String
+  tipoPessoa       TipoPessoa @default(FISICA)
   cpf              String?  @unique
-  rg               String?
+  cnpj             String?  @unique
   telefone         String?
   whatsapp         String?
-  email            String?
-  cidade           String?
-  estado           String?
   endereco         String?
-  origemLead       String?
   responsavelId    String?
   responsavel      Usuario? @relation("ClienteResponsavel", fields: [responsavelId], references: [id])
   dataEntrada      DateTime @default(now())

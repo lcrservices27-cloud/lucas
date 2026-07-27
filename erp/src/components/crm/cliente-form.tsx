@@ -15,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { clienteSchema, type ClienteFormValues, ESTADOS_BR } from "@/lib/validators/cliente";
-import { FORMA_PAGAMENTO_LABEL, PRODUTO_LABEL } from "@/lib/labels";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { clienteSchema, type ClienteFormValues } from "@/lib/validators/cliente";
+import { FORMA_PAGAMENTO_LABEL, PRODUTO_LABEL, TIPO_PESSOA_LABEL, TIPO_PESSOA_ORDER } from "@/lib/labels";
 import { formatCurrency } from "@/lib/utils";
 
 type Usuario = { id: string; nome: string };
@@ -35,16 +36,13 @@ export function ClienteForm({
   const form = useForm<z.input<typeof clienteSchema>, unknown, ClienteFormValues>({
     resolver: zodResolver(clienteSchema),
     defaultValues: {
+      tipoPessoa: "FISICA",
       nome: "",
       cpf: "",
-      rg: "",
+      cnpj: "",
       telefone: "",
       whatsapp: "",
-      email: "",
-      cidade: "",
-      estado: "",
       endereco: "",
-      origemLead: "",
       responsavelId: "",
       produto: undefined,
       valorContratado: 0,
@@ -57,6 +55,8 @@ export function ClienteForm({
   });
 
   const [pending, setPending] = React.useState(false);
+  const tipoPessoa = form.watch("tipoPessoa") ?? "FISICA";
+  const isEmpresa = tipoPessoa === "JURIDICA";
   const valorTotal = Number(form.watch("valorContratado")) || 0;
   const valorPago = Number(form.watch("valorPago")) || 0;
   const valorRestante = Math.max(0, valorTotal - valorPago);
@@ -83,19 +83,48 @@ export function ClienteForm({
     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="col-span-full space-y-1.5">
-          <Label htmlFor="nome">Nome completo *</Label>
+          <Label>Tipo de cliente *</Label>
+          <RadioGroup
+            className="flex gap-6"
+            value={tipoPessoa}
+            onValueChange={(v) =>
+              form.setValue("tipoPessoa", v as ClienteFormValues["tipoPessoa"], { shouldValidate: true })
+            }
+          >
+            {TIPO_PESSOA_ORDER.map((tipo) => (
+              <div key={tipo} className="flex items-center gap-2">
+                <RadioGroupItem value={tipo} id={`tipoPessoa-${tipo}`} />
+                <Label htmlFor={`tipoPessoa-${tipo}`} className="font-normal">
+                  {TIPO_PESSOA_LABEL[tipo]}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </div>
+        <div className="col-span-full space-y-1.5">
+          <Label htmlFor="nome">{isEmpresa ? "Razão social *" : "Nome completo *"}</Label>
           <Input id="nome" {...form.register("nome")} />
           {form.formState.errors.nome && (
             <p className="text-xs text-destructive">{form.formState.errors.nome.message}</p>
           )}
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="cpf">CPF *</Label>
-          <Input id="cpf" {...form.register("cpf")} placeholder="000.000.000-00" />
-          {form.formState.errors.cpf && (
-            <p className="text-xs text-destructive">{form.formState.errors.cpf.message}</p>
-          )}
-        </div>
+        {isEmpresa ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="cnpj">CNPJ *</Label>
+            <Input id="cnpj" {...form.register("cnpj")} placeholder="00.000.000/0000-00" />
+            {form.formState.errors.cnpj && (
+              <p className="text-xs text-destructive">{form.formState.errors.cnpj.message}</p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-1.5">
+            <Label htmlFor="cpf">CPF *</Label>
+            <Input id="cpf" {...form.register("cpf")} placeholder="000.000.000-00" />
+            {form.formState.errors.cpf && (
+              <p className="text-xs text-destructive">{form.formState.errors.cpf.message}</p>
+            )}
+          </div>
+        )}
         <div className="space-y-1.5">
           <Label htmlFor="produto">Produto contratado *</Label>
           <Select
@@ -118,49 +147,12 @@ export function ClienteForm({
           )}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="rg">RG</Label>
-          <Input id="rg" {...form.register("rg")} />
-        </div>
-        <div className="space-y-1.5">
           <Label htmlFor="telefone">Telefone</Label>
           <Input id="telefone" {...form.register("telefone")} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="whatsapp">WhatsApp</Label>
           <Input id="whatsapp" {...form.register("whatsapp")} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="email">E-mail</Label>
-          <Input id="email" type="email" {...form.register("email")} />
-          {form.formState.errors.email && (
-            <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
-          )}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="origemLead">Origem do lead</Label>
-          <Input id="origemLead" {...form.register("origemLead")} placeholder="Instagram Ads, indicação..." />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="cidade">Cidade</Label>
-          <Input id="cidade" {...form.register("cidade")} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="estado">Estado</Label>
-          <Select
-            value={form.watch("estado") || undefined}
-            onValueChange={(v) => form.setValue("estado", v)}
-          >
-            <SelectTrigger id="estado" className="w-full">
-              <SelectValue placeholder="UF" />
-            </SelectTrigger>
-            <SelectContent>
-              {ESTADOS_BR.map((uf) => (
-                <SelectItem key={uf} value={uf}>
-                  {uf}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
         <div className="col-span-full space-y-1.5">
           <Label htmlFor="endereco">Endereço</Label>

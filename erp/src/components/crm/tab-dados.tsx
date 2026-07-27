@@ -1,4 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PRODUTO_LABEL, TIPO_PESSOA_LABEL } from "@/lib/labels";
+import { formatCnpj, formatCpf } from "@/lib/utils";
 import type { ClienteDetail } from "@/lib/queries/cliente-detail";
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
@@ -11,21 +13,24 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export function TabDados({ cliente }: { cliente: ClienteDetail }) {
+  const isEmpresa = cliente.tipoPessoa === "JURIDICA";
+
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium">Dados pessoais</CardTitle>
+          <CardTitle className="text-sm font-medium">Dados cadastrais</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
-          <Field label="Nome" value={cliente.nome} />
-          <Field label="CPF" value={cliente.cpf} />
-          <Field label="RG" value={cliente.rg} />
+          <Field label="Tipo de cliente" value={TIPO_PESSOA_LABEL[cliente.tipoPessoa]} />
+          <Field label={isEmpresa ? "Razão social" : "Nome"} value={cliente.nome} />
+          {isEmpresa ? (
+            <Field label="CNPJ" value={formatCnpj(cliente.cnpj)} />
+          ) : (
+            <Field label="CPF" value={formatCpf(cliente.cpf)} />
+          )}
           <Field label="Telefone" value={cliente.telefone} />
           <Field label="WhatsApp" value={cliente.whatsapp} />
-          <Field label="E-mail" value={cliente.email} />
-          <Field label="Cidade" value={cliente.cidade} />
-          <Field label="Estado" value={cliente.estado} />
           <Field label="Endereço" value={cliente.endereco} />
         </CardContent>
       </Card>
@@ -35,7 +40,7 @@ export function TabDados({ cliente }: { cliente: ClienteDetail }) {
           <CardTitle className="text-sm font-medium">Comercial</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
-          <Field label="Origem do lead" value={cliente.origemLead} />
+          <Field label="Produto contratado" value={cliente.produto ? PRODUTO_LABEL[cliente.produto] : null} />
           <Field label="Responsável" value={cliente.responsavel?.nome} />
           <Field label="Data de entrada" value={new Date(cliente.dataEntrada).toLocaleDateString("pt-BR")} />
         </CardContent>

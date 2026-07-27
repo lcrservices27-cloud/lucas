@@ -1,8 +1,8 @@
 export type AssistenteDraftCliente = {
   nome?: string;
   cpf?: string;
+  cnpj?: string;
   telefone?: string;
-  cidade?: string;
   valorContratado?: number;
   valorEntrada?: number;
   observacaoPagamento?: string;

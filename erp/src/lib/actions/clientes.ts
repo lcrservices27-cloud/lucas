@@ -22,6 +22,14 @@ function toNullable(value?: string) {
   return value && value.trim() !== "" ? value.trim() : null;
 }
 
+// Guarda só o documento do tipo escolhido — trocar de pessoa física para
+// empresa (ou o contrário) limpa o documento antigo.
+function documentos(data: { tipoPessoa: "FISICA" | "JURIDICA"; cpf?: string; cnpj?: string }) {
+  return data.tipoPessoa === "JURIDICA"
+    ? { cpf: null, cnpj: toNullable(data.cnpj) }
+    : { cpf: toNullable(data.cpf), cnpj: null };
+}
+
 export async function createCliente(_prevState: FormState, formData: FormData): Promise<FormState> {
   const usuario = await getCurrentUser();
   if (!usuario) return { error: "Não autenticado." };
@@ -42,15 +50,11 @@ export async function createCliente(_prevState: FormState, formData: FormData): 
   const cliente = await prisma.cliente.create({
     data: {
       nome: data.nome,
-      cpf: toNullable(data.cpf),
-      rg: toNullable(data.rg),
+      tipoPessoa: data.tipoPessoa,
+      ...documentos(data),
       telefone: toNullable(data.telefone),
       whatsapp: toNullable(data.whatsapp),
-      email: toNullable(data.email),
-      cidade: toNullable(data.cidade),
-      estado: toNullable(data.estado),
       endereco: toNullable(data.endereco),
-      origemLead: toNullable(data.origemLead),
       responsavelId: toNullable(data.responsavelId),
       produto: data.produto,
       dataEntrada: data.dataEntrada ? new Date(data.dataEntrada) : undefined,
@@ -105,15 +109,11 @@ export async function updateCliente(clienteId: string, _prevState: FormState, fo
     where: { id: clienteId },
     data: {
       nome: data.nome,
-      cpf: toNullable(data.cpf),
-      rg: toNullable(data.rg),
+      tipoPessoa: data.tipoPessoa,
+      ...documentos(data),
       telefone: toNullable(data.telefone),
       whatsapp: toNullable(data.whatsapp),
-      email: toNullable(data.email),
-      cidade: toNullable(data.cidade),
-      estado: toNullable(data.estado),
       endereco: toNullable(data.endereco),
-      origemLead: toNullable(data.origemLead),
       responsavelId: toNullable(data.responsavelId),
       produto: data.produto,
       valorContratado: data.valorContratado ?? 0,

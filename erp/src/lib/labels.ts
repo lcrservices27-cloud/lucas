@@ -19,6 +19,13 @@ export const PRODUTO_LABEL: Record<string, string> = {
 
 export const PRODUTO_ORDER = ["RATING_COMERCIAL", "LIMPA_NOME"];
 
+export const TIPO_PESSOA_LABEL: Record<string, string> = {
+  FISICA: "Pessoa física",
+  JURIDICA: "Empresa",
+};
+
+export const TIPO_PESSOA_ORDER = ["FISICA", "JURIDICA"];
+
 export const STATUS_FINANCEIRO_LABEL: Record<string, string> = {
   NAO_INICIADO: "Não iniciado",
   ENTRADA_PAGA: "Entrada paga",

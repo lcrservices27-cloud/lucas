@@ -28,8 +28,8 @@ function resumoDraft(draft: AssistenteDraftCliente) {
   const resumo: { label: string; value: string }[] = [];
   if (draft.nome) resumo.push({ label: "Nome", value: draft.nome });
   if (draft.cpf) resumo.push({ label: "CPF", value: draft.cpf });
+  if (draft.cnpj) resumo.push({ label: "CNPJ", value: draft.cnpj });
   if (draft.telefone) resumo.push({ label: "Telefone", value: draft.telefone });
-  if (draft.cidade) resumo.push({ label: "Cidade", value: draft.cidade });
   if (draft.valorContratado) resumo.push({ label: "Valor do contrato", value: formatCurrency(draft.valorContratado) });
   if (draft.valorEntrada) resumo.push({ label: "Entrada paga", value: formatCurrency(draft.valorEntrada) });
   if (draft.observacaoPagamento) resumo.push({ label: "Observação", value: draft.observacaoPagamento });
@@ -130,18 +130,16 @@ export async function processarHeuristica(
       }
     }
 
-    if (t.includes("cpf")) {
+    if (t.includes("cnpj")) {
+      const digitos = extrairDigitos(textoOriginal);
+      if (digitos) {
+        draft.cnpj = digitos;
+        algoAtualizado = true;
+      }
+    } else if (t.includes("cpf")) {
       const digitos = extrairDigitos(textoOriginal);
       if (digitos) {
         draft.cpf = digitos;
-        algoAtualizado = true;
-      }
-    }
-
-    if (t.includes("cidade")) {
-      const cidade = extrairApos(textoLower, /cidade\s*(?:e|é)?\s*(.+)/i);
-      if (cidade) {
-        draft.cidade = capitalizarNome(cidade);
         algoAtualizado = true;
       }
     }

@@ -55,13 +55,13 @@ export function CommandPalette() {
         onClick={() => setOpen(true)}
         className="flex h-9 w-full max-w-sm items-center gap-2 rounded-md border bg-background px-3 text-sm text-muted-foreground shadow-xs hover:bg-accent/50 transition-colors"
       >
-        <span className="flex-1 text-left">Pesquisar clientes, CPF, telefone...</span>
+        <span className="flex-1 text-left">Pesquisar clientes, CPF, CNPJ, telefone...</span>
         <kbd className="pointer-events-none hidden select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
           <span>⌘</span>K
         </kbd>
       </button>
       <CommandDialog open={open} onOpenChange={setOpen} title="Pesquisa global" description="Pesquise clientes ou navegue pelo sistema">
-        <CommandInput placeholder="Digite um nome, CPF, telefone ou vá para uma página..." value={query} onValueChange={setQuery} />
+        <CommandInput placeholder="Digite um nome, CPF, CNPJ, telefone ou vá para uma página..." value={query} onValueChange={setQuery} />
         <CommandList>
           <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
           {clientes.length > 0 ? (
@@ -72,7 +72,7 @@ export function CommandPalette() {
                   <div className="flex flex-col">
                     <span>{c.nome}</span>
                     <span className="text-xs text-muted-foreground">
-                      {[c.cpf, c.telefone, c.cidade].filter(Boolean).join(" · ")}
+                      {[c.cpf ?? c.cnpj, c.telefone].filter(Boolean).join(" · ")}
                     </span>
                   </div>
                 </CommandItem>

@@ -7,8 +7,8 @@ export type SearchResult = {
   id: string;
   nome: string;
   cpf: string | null;
+  cnpj: string | null;
   telefone: string | null;
-  cidade: string | null;
 };
 
 export async function searchClientes(query: string): Promise<SearchResult[]> {
@@ -22,13 +22,12 @@ export async function searchClientes(query: string): Promise<SearchResult[]> {
       OR: [
         { nome: { contains: q, mode: "insensitive" } },
         { cpf: { contains: q } },
+        { cnpj: { contains: q } },
         { telefone: { contains: q } },
         { whatsapp: { contains: q } },
-        { email: { contains: q, mode: "insensitive" } },
-        { cidade: { contains: q, mode: "insensitive" } },
       ],
     },
-    select: { id: true, nome: true, cpf: true, telefone: true, cidade: true },
+    select: { id: true, nome: true, cpf: true, cnpj: true, telefone: true },
     take: 8,
     orderBy: { nome: "asc" },
   });

@@ -17,8 +17,13 @@ import { ClienteForm } from "@/components/crm/cliente-form";
 import { ExcluirClienteDialog } from "@/components/crm/excluir-cliente-dialog";
 import { updateCliente } from "@/lib/actions/clientes";
 import type { ClienteFormValues } from "@/lib/validators/cliente";
-import { STATUS_COMERCIAL_LABEL, STATUS_FINANCEIRO_LABEL, STATUS_FINANCEIRO_BADGE } from "@/lib/labels";
-import { formatCurrency, formatDate, initials } from "@/lib/utils";
+import {
+  STATUS_COMERCIAL_LABEL,
+  STATUS_FINANCEIRO_LABEL,
+  STATUS_FINANCEIRO_BADGE,
+  TIPO_PESSOA_LABEL,
+} from "@/lib/labels";
+import { documentoCliente, formatCurrency, formatDate, initials } from "@/lib/utils";
 import type { ClienteDetail } from "@/lib/queries/cliente-detail";
 
 export function ClienteHeader({
@@ -53,9 +58,10 @@ export function ClienteHeader({
         <div>
           <h1 className="text-xl font-semibold">{cliente.nome}</h1>
           <p className="text-sm text-muted-foreground">
-            {cliente.cpf ?? "CPF não informado"} · Cliente desde {formatDate(cliente.dataEntrada)}
+            {documentoCliente(cliente)} · Cliente desde {formatDate(cliente.dataEntrada)}
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
+            <Badge variant="secondary">{TIPO_PESSOA_LABEL[cliente.tipoPessoa]}</Badge>
             <Badge variant="outline">{STATUS_COMERCIAL_LABEL[cliente.statusComercial]}</Badge>
             <Badge variant={STATUS_FINANCEIRO_BADGE[cliente.statusFinanceiro]}>
               {STATUS_FINANCEIRO_LABEL[cliente.statusFinanceiro]}
@@ -90,16 +96,13 @@ export function ClienteHeader({
                 onSubmit={handleSubmit}
                 submitLabel="Salvar alterações"
                 defaultValues={{
+                  tipoPessoa: cliente.tipoPessoa,
                   nome: cliente.nome,
                   cpf: cliente.cpf ?? "",
-                  rg: cliente.rg ?? "",
+                  cnpj: cliente.cnpj ?? "",
                   telefone: cliente.telefone ?? "",
                   whatsapp: cliente.whatsapp ?? "",
-                  email: cliente.email ?? "",
-                  cidade: cliente.cidade ?? "",
-                  estado: cliente.estado ?? "",
                   endereco: cliente.endereco ?? "",
-                  origemLead: cliente.origemLead ?? "",
                   responsavelId: cliente.responsavelId ?? "",
                   produto: cliente.produto ?? undefined,
                   valorContratado: Number(cliente.valorContratado),

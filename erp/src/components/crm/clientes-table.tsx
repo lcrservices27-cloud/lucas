@@ -33,8 +33,9 @@ import {
   STATUS_FINANCEIRO_LABEL,
   STATUS_FINANCEIRO_BADGE,
   STATUS_FINANCEIRO_ORDER,
+  PRODUTO_LABEL,
 } from "@/lib/labels";
-import { formatCurrency, formatDate, initials } from "@/lib/utils";
+import { documentoCliente, formatCurrency, formatDate, initials } from "@/lib/utils";
 
 const baseColumns: ColumnDef<ClienteListItem>[] = [
   {
@@ -51,7 +52,7 @@ const baseColumns: ColumnDef<ClienteListItem>[] = [
         </Avatar>
         <div className="min-w-0">
           <p className="truncate font-medium">{row.original.nome}</p>
-          <p className="truncate text-xs text-muted-foreground">{row.original.cpf ?? "CPF não informado"}</p>
+          <p className="truncate text-xs text-muted-foreground">{documentoCliente(row.original)}</p>
         </div>
       </Link>
     ),
@@ -60,18 +61,15 @@ const baseColumns: ColumnDef<ClienteListItem>[] = [
     accessorKey: "telefone",
     header: "Contato",
     cell: ({ row }) => (
-      <div className="text-xs">
-        <p>{row.original.whatsapp ?? row.original.telefone ?? "—"}</p>
-        <p className="truncate text-muted-foreground">{row.original.email ?? ""}</p>
-      </div>
+      <span className="text-sm">{row.original.whatsapp ?? row.original.telefone ?? "—"}</span>
     ),
   },
   {
-    accessorKey: "cidade",
-    header: "Cidade",
+    accessorKey: "produto",
+    header: "Produto",
     cell: ({ row }) => (
       <span className="text-sm">
-        {row.original.cidade ? `${row.original.cidade}/${row.original.estado ?? ""}` : "—"}
+        {row.original.produto ? PRODUTO_LABEL[row.original.produto] : "—"}
       </span>
     ),
   },
@@ -159,7 +157,7 @@ export function ClientesTable({
     globalFilterFn: (row, _id, filterValue) => {
       const q = String(filterValue).toLowerCase();
       const c = row.original;
-      return [c.nome, c.cpf, c.telefone, c.whatsapp, c.email, c.cidade]
+      return [c.nome, c.cpf, c.cnpj, c.telefone, c.whatsapp]
         .filter(Boolean)
         .some((v) => v!.toLowerCase().includes(q));
     },
@@ -180,7 +178,7 @@ export function ClientesTable({
         <div className="relative max-w-sm flex-1">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar por nome, CPF, telefone, e-mail..."
+            placeholder="Buscar por nome, CPF, CNPJ, telefone..."
             className="pl-8"
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}

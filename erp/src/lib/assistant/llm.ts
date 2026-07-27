@@ -23,14 +23,14 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: "atualizar_cadastro_cliente",
     description:
-      "Registra ou atualiza um ou mais campos do cliente que está sendo cadastrado nesta conversa. Chame sempre que o usuário informar um novo dado (nome, cpf, telefone, cidade, valor do contrato, valor de entrada pago, ou observação sobre como o restante será pago).",
+      "Registra ou atualiza um ou mais campos do cliente que está sendo cadastrado nesta conversa. Chame sempre que o usuário informar um novo dado (nome ou razão social, cpf, cnpj, telefone, valor do contrato, valor de entrada pago, ou observação sobre como o restante será pago). Use cnpj quando o cliente for uma empresa.",
     input_schema: {
       type: "object",
       properties: {
         nome: { type: "string" },
         cpf: { type: "string" },
+        cnpj: { type: "string" },
         telefone: { type: "string" },
-        cidade: { type: "string" },
         valor_contratado: { type: "number" },
         valor_entrada: { type: "number" },
         observacao_pagamento: { type: "string" },
@@ -119,7 +119,7 @@ Estado atual da conversa: modo="${contexto.modo}"${
       : ""
   }.
 
-Se o modo for "cadastro_cliente", o usuário está no meio de um cadastro de cliente passo a passo — cada frase dele tende a informar um novo campo (nome, cpf, telefone, cidade, valor do contrato, valor de entrada, ou como o restante será pago). Chame "atualizar_cadastro_cliente" passando SOMENTE os campos novos mencionados nesta frase. Quando o usuário disser algo como "salvar", "pode salvar" ou "confirmar", chame "finalizar_cadastro_cliente".
+Se o modo for "cadastro_cliente", o usuário está no meio de um cadastro de cliente passo a passo — cada frase dele tende a informar um novo campo (nome ou razão social, cpf, cnpj, telefone, valor do contrato, valor de entrada, ou como o restante será pago). Chame "atualizar_cadastro_cliente" passando SOMENTE os campos novos mencionados nesta frase. Quando o usuário disser algo como "salvar", "pode salvar" ou "confirmar", chame "finalizar_cadastro_cliente".
 
 Se o usuário disser algo como "cadastrar um novo cliente" e o modo ainda não for "cadastro_cliente", chame "atualizar_cadastro_cliente" sem campos para iniciar o fluxo.
 
@@ -177,8 +177,8 @@ async function executarFerramenta(
       const draft = { ...(contexto.draftCliente ?? {}) };
       if (str(input.nome)) draft.nome = str(input.nome);
       if (str(input.cpf)) draft.cpf = str(input.cpf);
+      if (str(input.cnpj)) draft.cnpj = str(input.cnpj);
       if (str(input.telefone)) draft.telefone = str(input.telefone);
-      if (str(input.cidade)) draft.cidade = str(input.cidade);
       if (num(input.valor_contratado) !== undefined) draft.valorContratado = num(input.valor_contratado);
       if (num(input.valor_entrada) !== undefined) draft.valorEntrada = num(input.valor_entrada);
       if (str(input.observacao_pagamento)) draft.observacaoPagamento = str(input.observacao_pagamento);
@@ -206,8 +206,8 @@ async function executarFerramenta(
       const resumo = [
         draft.nome && { label: "Nome", value: draft.nome },
         draft.cpf && { label: "CPF", value: draft.cpf },
+        draft.cnpj && { label: "CNPJ", value: draft.cnpj },
         draft.telefone && { label: "Telefone", value: draft.telefone },
-        draft.cidade && { label: "Cidade", value: draft.cidade },
         draft.valorContratado && { label: "Valor do contrato", value: formatCurrency(draft.valorContratado) },
         draft.valorEntrada && { label: "Entrada paga", value: formatCurrency(draft.valorEntrada) },
         draft.observacaoPagamento && { label: "Observação", value: draft.observacaoPagamento },

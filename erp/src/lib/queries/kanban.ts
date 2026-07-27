@@ -6,8 +6,6 @@ export async function getClientesKanban() {
     select: {
       id: true,
       nome: true,
-      cidade: true,
-      estado: true,
       produto: true,
       valorContratado: true,
       statusComercial: true,
@@ -23,8 +21,6 @@ export async function getClientesKanban() {
     return {
       id: c.id,
       nome: c.nome,
-      cidade: c.cidade,
-      estado: c.estado,
       produto: c.produto,
       valorContratado: total,
       pago,
