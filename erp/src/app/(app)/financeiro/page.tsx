@@ -1,4 +1,4 @@
-import { Wallet, CalendarDays, TrendingUp, Hourglass, CheckCircle2, Clock } from "lucide-react";
+import { Wallet, CalendarDays, TrendingUp, TrendingDown, Hourglass, CheckCircle2, Clock } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -22,6 +22,21 @@ export default async function FinanceiroPage() {
         </div>
         <NovoLancamentoDialog />
       </div>
+
+      <Card className="border-destructive/30 bg-destructive/5">
+        <CardContent className="flex items-center justify-between gap-4 py-1">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-muted-foreground">💸 Custos Totais</p>
+            <p className="mt-1 truncate text-3xl font-semibold tracking-tight tabular-nums text-destructive">
+              {formatCurrency(kpis.custosTotais)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Soma de todas as despesas cadastradas.</p>
+          </div>
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+            <TrendingDown className="size-5" />
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <KpiCard label="Saldo do dia" value={formatCurrency(kpis.saldoDoDia)} icon={CalendarDays} tone={kpis.saldoDoDia >= 0 ? "success" : "destructive"} />

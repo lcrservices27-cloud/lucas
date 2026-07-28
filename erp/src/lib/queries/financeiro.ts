@@ -90,6 +90,12 @@ export async function getFinanceiroData() {
     .filter((r) => r.tipo === "RECEITA" && r.data >= inicioMes)
     .reduce((acc, r) => acc + r.valor, 0);
 
+  // Soma de todas as despesas cadastradas — recalculada a cada render,
+  // então cadastro/edição/exclusão de despesa já refletem no total.
+  const custosTotais = raw
+    .filter((r) => r.tipo === "DESPESA")
+    .reduce((acc, r) => acc + r.valor, 0);
+
   const totalPendente = clientes.reduce((acc, c) => {
     const total = Number(c.valorContratado);
     const pago = c.pagamentos.reduce((s, p) => s + Number(p.valor), 0);
@@ -101,6 +107,7 @@ export async function getFinanceiroData() {
       saldoDoDia,
       saldoAcumulado,
       totalRecebidoMes,
+      custosTotais,
       totalPendente,
       vendasFechadas,
       aguardandoPix,
