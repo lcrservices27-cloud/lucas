@@ -24,10 +24,14 @@ export function ClienteForm({
   defaultValues,
   onSubmit,
   submitLabel = "Salvar",
+  jaPago,
 }: {
   defaultValues?: Partial<ClienteFormValues>;
   onSubmit: (data: ClienteFormValues) => Promise<{ error?: string; fieldErrors?: Record<string, string[]> } | void>;
   submitLabel?: string;
+  /** Total já pago pelo cliente. Presente só na edição — é o que diferencia
+   *  "entrada no cadastro" de "pagamento novo que o cliente acabou de fazer". */
+  jaPago?: number;
 }) {
   const form = useForm<z.input<typeof clienteSchema>, unknown, ClienteFormValues>({
     resolver: zodResolver(clienteSchema),
@@ -52,9 +56,13 @@ export function ClienteForm({
   const [pending, setPending] = React.useState(false);
   const tipoPessoa = form.watch("tipoPessoa") ?? "FISICA";
   const isEmpresa = tipoPessoa === "JURIDICA";
+  const emEdicao = jaPago !== undefined;
+  const pagoAnterior = jaPago ?? 0;
   const valorTotal = Number(form.watch("valorContratado")) || 0;
   const valorPago = Number(form.watch("valorPago")) || 0;
-  const valorRestante = Math.max(0, valorTotal - valorPago);
+  // Na edição o campo é um recebimento novo, então o restante desconta também
+  // o que já havia sido pago antes.
+  const valorRestante = Math.max(0, valorTotal - pagoAnterior - valorPago);
 
   async function handleSubmit(values: ClienteFormValues) {
     setPending(true);
@@ -163,18 +171,40 @@ export function ClienteForm({
             <p className="text-xs text-destructive">{form.formState.errors.valorContratado.message}</p>
           )}
         </div>
+        {emEdicao && (
+          <div className="space-y-1.5">
+            <Label>Já pago</Label>
+            <div className="flex h-9 items-center rounded-md border bg-muted/40 px-3 text-sm font-semibold tabular-nums">
+              {formatCurrency(pagoAnterior)}
+            </div>
+          </div>
+        )}
         <div className="space-y-1.5">
-          <Label htmlFor="valorPago">Valor pago / entrada (R$)</Label>
+          <Label htmlFor="valorPago">
+            {emEdicao ? "Pagamento recebido agora (R$)" : "Valor pago / entrada (R$)"}
+          </Label>
           <Input id="valorPago" type="number" step="0.01" min={0} {...form.register("valorPago")} />
+          <p className="text-xs text-muted-foreground">
+            {emEdicao
+              ? "Só o que o cliente acabou de pagar. Entra no fluxo de caixa e abate o pendente."
+              : "Entrada paga no fechamento. Já entra no fluxo de caixa."}
+          </p>
           {form.formState.errors.valorPago && (
             <p className="text-xs text-destructive">{form.formState.errors.valorPago.message}</p>
           )}
         </div>
         <div className="space-y-1.5">
           <Label>Valor restante</Label>
-          <div className="flex h-9 items-center rounded-md border bg-muted/40 px-3 text-sm font-semibold tabular-nums">
+          <div
+            className={`flex h-9 items-center rounded-md border bg-muted/40 px-3 text-sm font-semibold tabular-nums ${
+              valorRestante === 0 && valorTotal > 0 ? "text-success" : ""
+            }`}
+          >
             {formatCurrency(valorRestante)}
           </div>
+          {emEdicao && valorRestante === 0 && valorTotal > 0 && (
+            <p className="text-xs text-success">Quitado — o cliente sai de pendente ao salvar.</p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="dataEntrada">Data da entrada *</Label>

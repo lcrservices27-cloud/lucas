@@ -9,6 +9,7 @@ import { clienteSchema } from "@/lib/validators/cliente";
 import { logTimeline } from "@/lib/actions/timeline";
 import { resolveStoragePath } from "@/lib/storage";
 import { calcularStatusCliente } from "@/lib/status-cliente";
+import { recalcularCliente, totalPagoDoCliente } from "@/lib/recalcular-cliente";
 import { formatCurrency } from "@/lib/utils";
 import { STATUS_COMERCIAL_ORDER, STATUS_COMERCIAL_LABEL } from "@/lib/labels";
 import type { StatusComercial } from "@/generated/prisma/enums";
@@ -124,8 +125,47 @@ export async function updateCliente(clienteId: string, _prevState: FormState, fo
 
   await logTimeline(clienteId, "OUTRO", "Dados cadastrais atualizados", usuario.id);
 
+  // Na edição o campo "valor pago" é um recebimento NOVO (o que o cliente
+  // acabou de pagar), não o total acumulado — vira uma linha no ledger, entra
+  // no fluxo de caixa e abate o pendente.
+  const total = data.valorContratado ?? 0;
+  const jaPago = await totalPagoDoCliente(clienteId);
+  const informado = data.valorPago ?? 0;
+  // Nunca deixa o total pago passar do contratado.
+  const aRegistrar = total > 0 ? Math.min(informado, Math.max(0, total - jaPago)) : informado;
+
+  if (aRegistrar > 0) {
+    const quitou = total > 0 && jaPago + aRegistrar >= total;
+    const tipo = jaPago === 0 ? (quitou ? "PAGAMENTO_UNICO" : "ENTRADA") : quitou ? "PAGAMENTO_FINAL" : "PARCELA";
+
+    await prisma.pagamento.create({
+      data: {
+        clienteId,
+        tipo,
+        metodo: "PIX",
+        valor: aRegistrar,
+        registradoPorId: usuario.id,
+        observacao: "Pagamento registrado na edição do cliente",
+      },
+    });
+    await logTimeline(
+      clienteId,
+      "PAGAMENTO_RECEBIDO",
+      `Pagamento registrado — ${formatCurrency(aRegistrar)}`,
+      usuario.id
+    );
+  }
+
+  // Roda sempre: mesmo sem pagamento novo, mudar o valor contratado pode
+  // quitar (ou reabrir) o cliente e precisa reposicionar os status.
+  await recalcularCliente(clienteId);
+
   revalidatePath(`/crm/${clienteId}`);
   revalidatePath("/crm");
+  revalidatePath("/comercial");
+  revalidatePath("/financeiro");
+  revalidatePath("/dashboard");
+  revalidatePath("/relatorios");
   return {};
 }
 

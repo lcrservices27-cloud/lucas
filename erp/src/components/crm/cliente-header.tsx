@@ -92,6 +92,7 @@ export function ClienteHeader({
               <ClienteForm
                 onSubmit={handleSubmit}
                 submitLabel="Salvar alterações"
+                jaPago={Math.max(0, Number(cliente.valorContratado) - saldo)}
                 defaultValues={{
                   tipoPessoa: cliente.tipoPessoa,
                   nome: cliente.nome,
